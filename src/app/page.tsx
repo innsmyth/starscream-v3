@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import SlideHolder from "./components/SlideHolder";
 import { PlaneAnimation } from "./components/PlaneAnimation";
+import { SatelliteAnimation } from "./components/SatelliteAnimation";
 import { haversineDistance } from "./lib/haversine";
 
 const CENTER_LAT = parseFloat(process.env.NEXT_PUBLIC_CENTER_LAT || "0");
@@ -11,6 +12,7 @@ const LOCAL_AIRPORT_LIST = (process.env.NEXT_PUBLIC_LOCAL_AIRPORT_CODES || "").s
 
 export default function Home() {
   const [statePlaneData, setStatePlaneData] = useState<any>(null);
+  const [stateSatelliteData, setStateSatelliteData] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState<string>("");
   const currentCallsign = useRef<string>("");
   const splideRef = useRef<any>(null);
@@ -32,6 +34,19 @@ export default function Home() {
     {
       title: "Airport Code",
       stat: planeData?.iata_code,
+      width: "w-5/12",
+    },
+  ];
+
+    const satelliteSlide = [
+    {
+      title: stateSatelliteData?.satname,
+      stat: stateSatelliteData?.intDesignator,
+      width: "w-7/12",
+    },
+    {
+      title: "Altitude",
+      stat: stateSatelliteData?.satalt,
       width: "w-5/12",
     },
   ];
@@ -118,7 +133,7 @@ export default function Home() {
     <div className="min-h-screen w-full bg-black">
       {statePlaneData && <PlaneAnimation />}
       <SlideHolder
-        slides={statePlaneData ? planeSlide : slides}
+        slides={statePlaneData ? planeSlide : (stateSatelliteData ? satelliteSlide : slides)}
         splideRef={splideRef}
       />
     </div>
