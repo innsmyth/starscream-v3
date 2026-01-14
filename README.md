@@ -3,7 +3,7 @@
 
 Starscream uses both public satellite data from [N2YO API](https://www.n2yo.com/) and live ADS-B data aggregated with [adsbdb API](https://www.adsbdb.com/) to identify planes and satellites overhead.
 
-Starscream is a fork of [Jetscreen-v2](https://github.com/jetclock/jetscreen-v2) an beta and open-source version of [JetClock](https://www.jetclock.io/)
+Our project is a fork of [Jetscreen-v2](https://github.com/jetclock/jetscreen-v2) a beta and open-source version of [JetClock](https://www.jetclock.io/), if you'd perfer an option with similar features ready made, we recommend going with them however you will not also have access to free contributor accounts with [Flightradar24](https://www.flightradar24.com/) or [FlightAware](https://www.flightaware.com/) as you would with Starscream.
 
 ## Requirements
 To run Starscream, you'll need the following hardware:
