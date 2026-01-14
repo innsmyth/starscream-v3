@@ -1,12 +1,13 @@
 # Starscream
 ![](https://github.com/innsmyth/starscream/blob/main/screendemo.gif)
 
-If you live on a flight path or often have planes flying overhead, you might wonder where in the world they've come from. Jetscreen uses live ADS-B data to identify planes flying overhead, and then looks up the origin via the [adsbdb API](https://www.adsbdb.com/).
+Starscream is a fork of [Jetscreen-v2](https://github.com/jetclock/jetscreen-v2) an beta and opensource version of [JetClock](https://www.jetclock.io/)
+Starscream uses both public satellite data from [N2YO API](https://www.n2yo.com/) and live ADS-B data aggregated with [adsbdb API](https://www.adsbdb.com/) to identify planes and satellites overhead.
 
 ## Requirements
 To run Starscream, you'll need the following hardware:
-- A Raspberry Pi (tested on a 3B+)
-- A monitor (the demo uses [WaveShare's 7.9in display](https://www.waveshare.com/wiki/7.9inch_HDMI_LCD))
+- A Raspberry Pi (tested on a [Pi4 Model B (2GB)](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/))
+- A monitor (our kiosk uses [Pi Touch Display 2](https://www.raspberrypi.com/products/touch-display-2/))
 - A USB ADS-B receiver (the demo uses the [FlightAware Pro Stick Plus](https://uk.flightaware.com/adsb/prostick/))
 
 ### 1. Set up the Raspberry Pi
