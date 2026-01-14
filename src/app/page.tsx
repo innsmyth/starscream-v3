@@ -94,7 +94,7 @@ export default function Home() {
         }
         currentCallsign.current = nearestPlaneCallsign;
         const flightDetails = await fetch(
-          `/api/getroute?callsign=${nearestPlaneCallsign}`
+          `/api/getAirRoute?callsign=${nearestPlaneCallsign}`
         );
         const flightInfo = await flightDetails.json();
 
@@ -110,6 +110,60 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Failed to fetch aircraft data", error);
+    }
+  };
+
+  const getSatellitesAround = async () => {
+    try {
+      const satellitesAround = await fetch("/api/starship");
+      const response = await satellitesAround.json();
+
+      const satelliteDistances = response.starship
+        .map((satellite: any) => {
+          if (!satellite.orbit || !satellite.lat || !satellite.lon) {
+            return null;
+          }
+          const distance = haversineDistance(
+            CENTER_LAT,
+            CENTER_LON,
+            satellite.lat,
+            satellite.lon
+          );
+          if (distance > RADIUS_KM) {
+            return null;
+          }
+          return { ...satellite, distance };
+        })
+        .filter((satellite: any) => satellite !== null);
+
+      if (satelliteDistances.length === 0) {
+        setStateSatelliteData(null);
+        return;
+      }
+
+      try {
+        const nearestSatelliteCallsign = satelliteDistances[0]?.orbit.trim();
+        if (currentCallsign.current === nearestSatelliteCallsign) {
+          return;
+        }
+        currentCallsign.current = nearestSatelliteCallsign;
+        const orbitDetails = await fetch(
+          `/api/getStarRoute?callsign=${nearestSatelliteCallsign}`
+        );
+        const orbitInfo = await orbitDetails.json();
+
+        if (orbitDetails.ok) {
+          const orbitRoute = orbitInfo.response.orbitroute;
+          console.log("Orbit route:", orbitRoute);
+          setStateSatelliteData(orbitRoute);
+        } else {
+          console.error("Error fetching orbit details:", orbitInfo.error);
+        }
+      } catch (error) {
+        console.error("Failed to fetch starship data", error);
+      }
+    } catch (error) {
+      console.error("Failed to fetch starship data", error);
     }
   };
 
@@ -129,11 +183,20 @@ export default function Home() {
     return () => clearInterval(planeInterval);
   }, []);
 
+  useEffect(() => {
+    getSatellitesAround();
+    // Fetch aircraft data every 10 seconds
+    const satelliteInterval = setInterval(() => {
+      getSatellitesAround();
+    }, 10000);
+    return () => clearInterval(satelliteInterval);
+  }, []);
+
   return (
     <div className="min-h-screen w-full bg-black">
       {statePlaneData && <PlaneAnimation />}
       <SlideHolder
-        slides={statePlaneData ? planeSlide : (stateSatelliteData ? satelliteSlide : slides)}
+        slides={statePlaneData ? planeSlide : slides} //(stateSatelliteData ? satelliteSlide : slides)
         splideRef={splideRef}
       />
     </div>
