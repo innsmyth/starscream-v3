@@ -1,7 +1,8 @@
 # Starscream
 ![](https://github.com/innsmyth/starscream/blob/main/screendemo.gif)
 
-Starscream is a fork of [Jetscreen-v2](https://github.com/jetclock/jetscreen-v2) an beta and opensource version of [JetClock](https://www.jetclock.io/)
+Starscream is a fork of [Jetscreen-v2](https://github.com/jetclock/jetscreen-v2) an beta and open-source version of [JetClock](https://www.jetclock.io/)
+
 Starscream uses both public satellite data from [N2YO API](https://www.n2yo.com/) and live ADS-B data aggregated with [adsbdb API](https://www.adsbdb.com/) to identify planes and satellites overhead.
 
 ## Requirements
