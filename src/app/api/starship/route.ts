@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 export const revalidate = 0;
-const API_URL = process.env.LOCAL_N2YO_URL || "";
+const API_URL = process.env.LOCAL_N2YO_PATH || "";
 
 export async function GET() {
   try {
