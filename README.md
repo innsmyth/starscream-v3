@@ -67,7 +67,7 @@ touch .env.local
 Edit this file to include the following variables:
 ```bash
 LOCAL_ADSB_URL=http://192.168.1.100:8080/data/aircraft.json
-LOCAL_N2YO_URL=http://192.168.1.100:8080/data/starship.json
+LOCAL_N2YO_PATH=/run/n2yo/data/starship.json
 NEXT_PUBLIC_FLIGHT_DETAILS_URL=https://api.adsbdb.com/v0/callsign/
 NEXT_PUBLIC_ORBIT_DETAILS_URL=https://api.n2yo.com/rest/v1/satellite/above/
 NEXT_PUBLIC_CENTER_LAT=51.47674088740635
