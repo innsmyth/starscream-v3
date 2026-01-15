@@ -38,7 +38,7 @@ npm -v
 
 Ensure you have the latest versions.
 
-### 4. Clone the Jetscreen Repository
+### 4. Clone the Starscream Repository
 Clone the **Starscream** repository from GitHub:
 
 ```bash
