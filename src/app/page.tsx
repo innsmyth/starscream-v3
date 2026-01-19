@@ -118,16 +118,16 @@ export default function Home() {
       const satellitesAround = await fetch("/api/starship");
       const response = await satellitesAround.json();
 
-      const satelliteDistances = response.starship
+      const satelliteData = response.above
         .map((satellite: any) => {
-          if (!satellite.orbit || !satellite.lat || !satellite.lon) {
+          if (!satellite.satid || !satellite.satname || !satellite.intDesignator !satellite.launchDate || !satellite.satalt || !satellite.satlat || !satellite.satlon) {
             return null;
           }
           const distance = haversineDistance(
             CENTER_LAT,
             CENTER_LON,
-            satellite.lat,
-            satellite.lon
+            satellite.satlat,
+            satellite.satlon
           );
           if (distance > RADIUS_KM) {
             return null;
@@ -142,17 +142,7 @@ export default function Home() {
       }
 
       try {
-        const nearestSatelliteCallsign = satelliteDistances[0]?.orbit.trim();
-        if (currentCallsign.current === nearestSatelliteCallsign) {
-          return;
-        }
-        currentCallsign.current = nearestSatelliteCallsign;
-        const orbitDetails = await fetch(
-          `/api/getStarRoute?callsign=${nearestSatelliteCallsign}`
-        );
-        const orbitInfo = await orbitDetails.json();
-
-        if (orbitDetails.ok) {
+        if (satellitesAround.ok) {
           const orbitRoute = orbitInfo.response.orbitroute;
           console.log("Orbit route:", orbitRoute);
           setStateSatelliteData(orbitRoute);
@@ -196,7 +186,7 @@ export default function Home() {
     <div className="min-h-screen w-full bg-black">
       {statePlaneData && <PlaneAnimation />}
       <SlideHolder
-        slides={statePlaneData ? planeSlide : slides} //(stateSatelliteData ? satelliteSlide : slides)
+        slides={statePlaneData ? planeSlide : (stateSatelliteData ? satelliteSlide : slides)} //slides
         splideRef={splideRef}
       />
     </div>
