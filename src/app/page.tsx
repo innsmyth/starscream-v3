@@ -121,14 +121,14 @@ export default function Home() {
 
       const satelliteData = response.above
         .map((satellite: any) => {
-          if (!satellite.satid || !satellite.satname || !satellite.intDesignator || !satellite.launchDate || !satellite.satalt || !satellite.satlat || !satellite.satlon) {
+          if (!satellite.satid || !satellite.satname || !satellite.intDesignator || !satellite.launchDate || !satellite.satalt || !satellite.satlat || !satellite.satlng) {
             return null;
           }
           const distance = haversineDistance(
             CENTER_LAT,
             CENTER_LON,
             satellite.satlat,
-            satellite.satlon
+            satellite.satlng
           );
           if (distance > RADIUS_KM) {
             return null;
