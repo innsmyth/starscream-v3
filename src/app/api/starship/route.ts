@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
 export const revalidate = 0;
-const API_URL = process.env.LOCAL_N2YO_PATH || "";
+const BASE_URL = process.env.NEXT_PUBLIC_ORBIT_DETAILS_URL || "";
+const CENTER_LAT = process.env.NEXT_PUBLIC_CENTER_LAT || "";
+const CENTER_LON = process.env.NEXT_PUBLIC_CENTER_LON || "";
+const CENTER_ALT = process.env.NEXT_PUBLIC_CENTER_ALT || "";
+const RADIUS_KM = process.env.NEXT_PUBLIC_RADIUS_KM || "";
+const API_KEY = process.env.API_KEY_N2YO || "";
 
 export async function GET() {
   try {
+    const API_URL = `${BASE_URL}${CENTER_LAT}/${CENTER_LON}/${CENTER_ALT}/${RADIUS_KM}/0/&apiKey=${API_KEY}`
     // Fetch data from the external API
     const response = await fetch(API_URL);
 
