@@ -120,7 +120,7 @@ export default function Home() {
 
       const satelliteData = response.above
         .map((satellite: any) => {
-          if (!satellite.satid || !satellite.satname || !satellite.intDesignator !satellite.launchDate || !satellite.satalt || !satellite.satlat || !satellite.satlon) {
+          if (!satellite.satid || !satellite.satname || !satellite.intDesignator || !satellite.launchDate || !satellite.satalt || !satellite.satlat || !satellite.satlon) {
             return null;
           }
           const distance = haversineDistance(
