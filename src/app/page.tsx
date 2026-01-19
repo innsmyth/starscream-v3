@@ -136,7 +136,7 @@ export default function Home() {
         })
         .filter((satellite: any) => satellite !== null);
 
-      if (satelliteDistances.length === 0) {
+      if (satelliteData.length === 0) {
         setStateSatelliteData(null);
         return;
       }
