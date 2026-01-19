@@ -74,6 +74,7 @@ NEXT_PUBLIC_CENTER_LON=-0.23339838187103154
 NEXT_PUBLIC_CENTER_ALT=0
 NEXT_PUBLIC_RADIUS_KM=2
 NEXT_PUBLIC_LOCAL_AIRPORT_CODES=YVR,YYX
+API_KEY_N2YO=XXXXXX-XXXXXX-XXXXXX-XXXX
 TEST_LOCAL_ADSB_URL=/run/starscream/adsb/data/aircraft.json
 TEST_LOCAL_N2YO_URL=/run/starscream/n2yo/data/starship.json
 ```
@@ -87,8 +88,8 @@ TEST_LOCAL_N2YO_URL=/run/starscream/n2yo/data/starship.json
 - `NEXT_PUBLIC_CENTER_ALT`: The altitude of the center point (replace with your location).
 - `NEXT_PUBLIC_RADIUS_KM`: The radius (in kilometers) for which you want to track planes around your center point.
 - `NEXT_PUBLIC_LOCAL_AIRPORT_CODES`: (Optional) The IATA codes for the local airports near you, as a comma separated list. If the flight origin is your local airport's IATA code, the Destination information will be displayed instead.
-- `TEST_LOCAL_ADSB_URL`: The URL of your local test ADSB data for development purposes.
-- `TEST_LOCAL_N2YO_URL`: The URL of your local test N2YO data for development purposes.
+- `TEST_LOCAL_ADSB_PATH`: The URL of your local test ADSB data for development purposes.
+- `TEST_LOCAL_N2YO_PATH`: The URL of your local test N2YO data for development purposes.
 
 ### 7. Start the Development Server
 To start the server in development mode, run the following command:
