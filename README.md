@@ -67,7 +67,6 @@ touch .env.local
 Edit this file to include the following variables:
 ```bash
 LOCAL_ADSB_URL=http://192.168.1.100:8080/data/aircraft.json
-LOCAL_N2YO_PATH=/run/n2yo/data/starship.json
 NEXT_PUBLIC_FLIGHT_DETAILS_URL=https://api.adsbdb.com/v0/callsign/
 NEXT_PUBLIC_ORBIT_DETAILS_URL=https://api.n2yo.com/rest/v1/satellite/above/
 NEXT_PUBLIC_CENTER_LAT=51.47674088740635
@@ -75,11 +74,12 @@ NEXT_PUBLIC_CENTER_LON=-0.23339838187103154
 NEXT_PUBLIC_CENTER_ALT=0
 NEXT_PUBLIC_RADIUS_KM=2
 NEXT_PUBLIC_LOCAL_AIRPORT_CODES=YVR,YYX
+TEST_LOCAL_ADSB_URL=/run/starscream/adsb/data/aircraft.json
+TEST_LOCAL_N2YO_URL=/run/starscream/n2yo/data/starship.json
 ```
 
 #### Explanation of Environment Variables:
 - `LOCAL_ADSB_URL`: The URL of your local ADS-B data stream (replace with your actual IP and port).
-- `LOCAL_N2YO_URL`: The URL of your local N2YO data stream (replace with your actual IP and port).
 - `NEXT_PUBLIC_FLIGHT_DETAILS_URL`: The adsbdb API URL to fetch flight details by callsign - [hexdb.io](https://hexdb.io) is another option.
 - `NEXT_PUBLIC_ORBIT_DETAILS_URL`: The N2YO API URL to fetch orbital details based on lat/lon/alt of center point (your location).
 - `NEXT_PUBLIC_CENTER_LAT`: The latitude of the center point of the map where you're tracking planes (replace with your location).
@@ -87,6 +87,8 @@ NEXT_PUBLIC_LOCAL_AIRPORT_CODES=YVR,YYX
 - `NEXT_PUBLIC_CENTER_ALT`: The altitude of the center point (replace with your location).
 - `NEXT_PUBLIC_RADIUS_KM`: The radius (in kilometers) for which you want to track planes around your center point.
 - `NEXT_PUBLIC_LOCAL_AIRPORT_CODES`: (Optional) The IATA codes for the local airports near you, as a comma separated list. If the flight origin is your local airport's IATA code, the Destination information will be displayed instead.
+- `TEST_LOCAL_ADSB_URL`: The URL of your local test ADSB data for development purposes.
+- `TEST_LOCAL_N2YO_URL`: The URL of your local test N2YO data for development purposes.
 
 ### 7. Start the Development Server
 To start the server in development mode, run the following command:
