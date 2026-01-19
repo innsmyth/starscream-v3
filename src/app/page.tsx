@@ -15,6 +15,7 @@ export default function Home() {
   const [stateSatelliteData, setStateSatelliteData] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState<string>("");
   const currentCallsign = useRef<string>("");
+  const currentSatellite = useRef<any>(null);
   const splideRef = useRef<any>(null);
 
   // Code to determine if we use the origin or destination:
@@ -89,7 +90,7 @@ export default function Home() {
 
       try {
         const nearestPlaneCallsign = planeDistances[0]?.flight.trim();
-        if (currentCallsign.current === nearestPlaneCallsign) {
+        if (currentCallsign.current === enarestPlaneCallsign) {
           return;
         }
         currentCallsign.current = nearestPlaneCallsign;
@@ -142,12 +143,16 @@ export default function Home() {
       }
 
       try {
+        const nearestSatellite = satelliteData[0];
+        if (currentSatellite.current === nearestSatellite) {
+          return;
+        }
+        currentSatellite.current = nearestSatellite;
+        
         if (satellitesAround.ok) {
-          const orbitRoute = orbitInfo.response.orbitroute;
-          console.log("Orbit route:", orbitRoute);
-          setStateSatelliteData(orbitRoute);
+          setStateSatelliteData(nearestSatellite);
         } else {
-          console.error("Error fetching orbit details:", orbitInfo.error);
+          console.error("Error fetching nearest satellite details:", response.error);
         }
       } catch (error) {
         console.error("Failed to fetch starship data", error);
