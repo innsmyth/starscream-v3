@@ -90,7 +90,7 @@ export default function Home() {
 
       try {
         const nearestPlaneCallsign = planeDistances[0]?.flight.trim();
-        if (currentCallsign.current === enarestPlaneCallsign) {
+        if (currentCallsign.current === nearestPlaneCallsign) {
           return;
         }
         currentCallsign.current = nearestPlaneCallsign;
