@@ -189,9 +189,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full bg-black">
-      {statePlaneData && <PlaneAnimation />}
+      {(statePlaneData && <PlaneAnimation />) || (stateSatelliteData && <SatelliteAnimation />)}
       <SlideHolder
-        slides={statePlaneData ? planeSlide : slides} //(stateSatelliteData ? satelliteSlide : slides)
+        slides={statePlaneData ? planeSlide : (stateSatelliteData ? satelliteSlide : slides)}
         splideRef={splideRef}
       />
     </div>
