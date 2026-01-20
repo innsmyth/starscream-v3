@@ -183,13 +183,13 @@ export default function Home() {
     // Fetch aircraft data every 10 seconds
     const satelliteInterval = setInterval(() => {
       getSatellitesAround();
-    }, 15000);
+    }, 10000);
     return () => clearInterval(satelliteInterval);
   }, []);
 
   return (
     <div className="min-h-screen w-full bg-black">
-      {(statePlaneData && <PlaneAnimation />) || (stateSatelliteData && <SatelliteAnimation />)}
+      {statePlaneData && <PlaneAnimation />}
       <SlideHolder
         slides={statePlaneData ? planeSlide : (stateSatelliteData ? satelliteSlide : slides)} //slides
         splideRef={splideRef}
