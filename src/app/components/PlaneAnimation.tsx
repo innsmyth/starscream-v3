@@ -14,7 +14,7 @@ export const PlaneAnimation = ({}: PlaneAnimationProps) => {
               </defs>
               <g id="javiPlane">
                 <path
-                  fill="#0"
+                  fill="#fff"
                   d="M412.051086,236.062790 
                     C412.052673,247.051926 412.287292,257.557526 411.944672,268.044281 
                     C411.797394,272.552521 413.036255,275.334900 416.957855,277.830811 
@@ -66,7 +66,7 @@ export const PlaneAnimation = ({}: PlaneAnimationProps) => {
               </g>
               <g id="javiShadow" transform="scale(.9)">
                 <path
-                  fill="#0"
+                  fill="#fff"
                   fillOpacity="0.3"
                   d="M412.051086,236.062790 
                   	C412.052673,247.051926 412.287292,257.557526 411.944672,268.044281 
