@@ -5,7 +5,7 @@ export ME="kallan"
 if [[ ! -f /starscream ]]; then
 	sudo mkdir /starscream/
 	sudo chown $ME:$ME /starscream/
-	sudo cp /home/$ME/initial_setup.sh /starscream/
+	sudo cp /home/$ME/starscream-v3/initial_setup.sh /starscream/
 fi
 
 if [[ ! -f "/etc/rc.local" ]]; then
@@ -57,6 +57,13 @@ case $(tail -n 1 /starscream/setup.log) in
 
 		sudo echo "piaware services enabled" > /starscream/setup.log
 		;;
+	"piaware services enabled")
+		cp /home/$ME/starscream-v3/.env.default /home/$ME/starscream-v3/.env.local
+		cd /home/$ME/starscream-v3/
+		npm run build
+		npm start
+		sudo apt install firefox -y
+		firefox --kiosk http://localhost:3000
 	*)
 		echo "this script is broken, delete setup.log at /var/run/setup.log"
 		;;
