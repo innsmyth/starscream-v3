@@ -20,7 +20,7 @@ fi
 
 if [[ ! -f "/etc/rc.local" ]]; then
 	sudo touch /etc/rc.local
-	sudo bash -c 'echo -e "#!/bin/sh -e\n/starscream/initial_setup.sh &\nexit 0" > /etc/rc.local'
+	sudo bash -c 'echo -e "#!/bin/sh -e\n/starscream/starscream-v3/initial_setup.sh &\nexit 0" > /etc/rc.local'
 	sudo chmod 755 /etc/rc.local
 	sudo systemctl enable rc-local.service
 	sudo systemctl start rc-local.service
