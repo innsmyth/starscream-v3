@@ -8,11 +8,11 @@ fi
 
 if [[ ! -f /starscream ]]; then
 	sudo mkdir /starscream/
-	sudo chown $user:$user /starscream/
+	#sudo chown $user:$user /starscream/
 	cd /starscream/
 	sudo git clone https://github.com/innsmyth/starscream-v3.git
 	sudo cp /starscream/starscream-v3/.env.default /starscream/starscream-v3/.env.local
-	sudo chown -R $user:$user /starscream/
+	#sudo chown -R $user:$user /starscream/
 	sudo git config --global --add safe.directory /starscream/starscream-v3	
 fi
 
@@ -27,7 +27,7 @@ fi
 
 if [[ ! -f "/starscream/setup.log" ]]; then
 	sudo touch /starscream/setup.log
-	sudo chown $user:$user /starscream/setup.log
+	#sudo chown $user:$user /starscream/setup.log
 	sudo bash -c 'echo "start" > /starscream/setup.log'
 fi
 
@@ -70,12 +70,12 @@ case $(tail -n 1 /starscream/setup.log) in
 	"piaware services enabled")
 		cd /starscream/starscream-v3
 		sudo git pull
-		sudo chown -R $user:$user /starscream/starscream-v3/
+		#sudo chown -R $user:$user /starscream/starscream-v3/
 		sudo npm install
 		sudo npm run build
 		nohup npm start &
 		sudo apt install firefox -y
-		sudo firefox --kiosk http://localhost:3000
+		firefox --kiosk http://localhost:3000
 		;;
 	*)
 		sudo echo "this script is broken, delete setup.log at /var/run/setup.log"
