@@ -9,8 +9,6 @@ fi
 if [[ ! -f /starscream ]]; then
 	sudo mkdir /starscream/
 	sudo chown $user:$user /starscream/
-	setuploc="$( cd "$( dirname "${BASSH_SOURCE[0]}" )" &> /dev/null && pwd )"
-	sudo cp $setuploc/initial_setup.sh /starscream/
 	cd /starscream/
 	sudo git clone https://github.com/innsmyth/starscream-v3.git
 	sudo cp /starscream/starscream-v3/.env.default /starscream/starscream-v3/.env.local
