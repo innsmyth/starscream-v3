@@ -69,8 +69,9 @@ case $(tail -n 1 /starscream/setup.log) in
 		;;
 	"piaware services enabled")
 		cd /starscream/starscream-v3
-		npm run build
-		npm start
+		sudo npm install
+		sudo npm run build
+		nohup npm start &
 		sudo apt install firefox -y
 		firefox --kiosk http://localhost:3000
 		;;
