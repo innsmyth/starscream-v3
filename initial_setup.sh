@@ -69,6 +69,8 @@ case $(tail -n 1 /starscream/setup.log) in
 		;;
 	"piaware services enabled")
 		cd /starscream/starscream-v3
+		sudo git pull
+		sudo chown -R $user:$user /starscream/starscream-v3/
 		sudo npm install
 		sudo npm run build
 		nohup npm start &
