@@ -13,7 +13,7 @@ if [[ ! -f /starscream ]]; then
 	sudo git clone https://github.com/innsmyth/starscream-v3.git
 	sudo cp /starscream/starscream-v3/.env.default /starscream/starscream-v3/.env.local
 	sudo chown -R $user:$user /starscream/
-	
+	sudo git config --global --add safe.directory /starscream/starscream-v3	
 fi
 
 if [[ ! -f "/etc/rc.local" ]]; then
