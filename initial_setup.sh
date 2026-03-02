@@ -75,7 +75,7 @@ case $(tail -n 1 /starscream/setup.log) in
 		sudo npm run build
 		nohup npm start &
 		sudo apt install firefox -y
-		firefox --kiosk http://localhost:3000
+		sudo firefox --kiosk http://localhost:3000
 		;;
 	*)
 		sudo echo "this script is broken, delete setup.log at /var/run/setup.log"
