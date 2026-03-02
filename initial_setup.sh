@@ -2,17 +2,11 @@
 
 user="starscream"
 
-if ! id $user &>/dev/null; then
-	sudo useradd -r -s /usr/sbin/nologin -M -c "Service Account for starscream" $user
-fi
-
 if [[ ! -f /starscream ]]; then
 	sudo mkdir /starscream/
-	#sudo chown $user:$user /starscream/
 	cd /starscream/
 	sudo git clone https://github.com/innsmyth/starscream-v3.git
 	sudo cp /starscream/starscream-v3/.env.default /starscream/starscream-v3/.env.local
-	#sudo chown -R $user:$user /starscream/
 	sudo git config --global --add safe.directory /starscream/starscream-v3	
 fi
 
@@ -27,14 +21,14 @@ fi
 
 if [[ ! -f "/starscream/setup.log" ]]; then
 	sudo touch /starscream/setup.log
-	#sudo chown $user:$user /starscream/setup.log
 	sudo bash -c 'echo "start" > /starscream/setup.log'
 fi
 
-#su - $user
-
 case $(tail -n 1 /starscream/setup.log) in
 	"start")
+		mkdir /home/$USER/.config/autostart
+		touch /home/$USER/.config/autostart/.desktop
+		echo "firefox --kiosk http://localhost:3000" > /home/$USER/.config/autostart/.desktop
 		sudo apt update
 		sudo apt full-upgrade -y
 		sudo bash -c 'echo "initial updates" > /starscream/setup.log'
@@ -70,12 +64,10 @@ case $(tail -n 1 /starscream/setup.log) in
 	"piaware services enabled")
 		cd /starscream/starscream-v3
 		sudo git pull
-		#sudo chown -R $user:$user /starscream/starscream-v3/
 		sudo npm install
 		sudo npm run build
 		nohup npm start &
 		sudo apt install firefox -y
-		firefox --kiosk http://localhost:3000
 		;;
 	*)
 		sudo echo "this script is broken, delete setup.log at /var/run/setup.log"
