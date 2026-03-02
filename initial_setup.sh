@@ -26,9 +26,21 @@ fi
 
 case $(tail -n 1 /starscream/setup.log) in
 	"start")
-		mkdir /home/$USER/.config/autostart
-		touch /home/$USER/.config/autostart/.desktop
-		echo "firefox --kiosk http://localhost:3000" > /home/$USER/.config/autostart/.desktop
+		if [[ ! -f "/home/$USER/.config/autostart" ]]; then
+			mkdir /home/$USER/.config/autostart
+		fi
+		if [[ ! -f "/home/$USER/.config/autostart/.desktop" ]]; then
+			touch /home/$USER/.config/autostart/.desktop
+		fi
+		if [[ ! -f "/home/$USER/.starscream/" ]]; then
+			mkdir /home/$USER/.starscream
+		fi
+		if [[ ! -f "/home/$USER/.starscream/startkiosk.sh" ]]; then
+			touch /home/$USER/.starscream/startkiosk.sh
+			echo "firefox --kiosk http://localhost:3000" >> /home/$USER/.starscream/startkiosk.sh
+			chmod 755 /home/$USER/.starscream/startkiosk.sh
+		fi
+		echo "[Desktop Entry]\nType=Application\nExec=/home/$USER/.starscream/startkiosk.sh\nHidden=false\nNoDisplay=false\nX-GNOME-Autostart-enabled=true\nName=startkiosk\nTerminal=false\n" >> /home/$USER/.config/autostart/.desktop
 		sudo apt update
 		sudo apt full-upgrade -y
 		sudo bash -c 'echo "initial updates" > /starscream/setup.log'
