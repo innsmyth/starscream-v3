@@ -37,10 +37,22 @@ case $(tail -n 1 /starscream/setup.log) in
 		fi
 		if [[ ! -f "/home/$USER/.starscream/startkiosk.sh" ]]; then
 			touch /home/$USER/.starscream/startkiosk.sh
+			echo "cd /starscream/starscream-v3" >> /home/$USER/.starscream/startkiosk.sh
+			echo "sudo git pull" >> /home/$USER/.starscream/startkiosk.sh
+			echo "sudo npm install" >> /home/$USER/.starscream/startkiosk.sh
+			echo "sudo npm run build" >> /home/$USER/.starscream/startkiosk.sh
+			echo "nohup npm start &" >> /home/$USER/.starscream/startkiosk.sh
 			echo "firefox --kiosk http://localhost:3000" >> /home/$USER/.starscream/startkiosk.sh
 			chmod 755 /home/$USER/.starscream/startkiosk.sh
 		fi
-		echo "[Desktop Entry]\nType=Application\nExec=/home/$USER/.starscream/startkiosk.sh\nHidden=false\nNoDisplay=false\nX-GNOME-Autostart-enabled=true\nName=startkiosk\nTerminal=false\n" >> /home/$USER/.config/autostart/.desktop
+		echo "[Desktop Entry]" >> /home/$USER/.config/autostart/.desktop
+		echo "Type=Application" >> /home/$USER/.config/autostart/.desktop
+		echo "Exec=/home/$USER/.starscream/startkiosk.sh" >> /home/$USER/.config/autostart/.desktop
+		echo "Hidden=false" >> /home/$USER/.config/autostart/.desktop
+		echo "NoDisplay=false" >> /home/$USER/.config/autostart/.desktop
+		echo "X-GNOME-Autostart-enabled=true" >> /home/$USER/.config/autostart/.desktop
+		echo "Name=startkiosk" >> /home/$USER/.config/autostart/.desktop
+		echo "Terminal=false\n" >> /home/$USER/.config/autostart/.desktop
 		sudo apt update
 		sudo apt full-upgrade -y
 		sudo bash -c 'echo "initial updates" > /starscream/setup.log'
@@ -59,6 +71,7 @@ case $(tail -n 1 /starscream/setup.log) in
 		sudo apt install dump1090-fa -y
 		sudo apt install dump978-fa -y
 		sudo apt install nodejs npm -y
+		sudo apt install firefox -y
 
 		sudo bash -c 'echo "piaware and dump installed" > /starscream/setup.log'
 		sudo reboot
@@ -79,7 +92,6 @@ case $(tail -n 1 /starscream/setup.log) in
 		sudo npm install
 		sudo npm run build
 		nohup npm start &
-		sudo apt install firefox -y
 		;;
 	*)
 		sudo echo "this script is broken, delete setup.log at /var/run/setup.log"
