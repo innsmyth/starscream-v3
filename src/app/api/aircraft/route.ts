@@ -31,6 +31,12 @@ export async function GET() {
         seen: now,
       };
 
+      // Environment toggle to force the test plane on while developing or testing.
+      const envForce = (process.env.NEXT_PUBLIC_ENABLE_TEST_PLANE || "").toLowerCase();
+      if (envForce === "1" || envForce === "true") {
+        return NextResponse.json({ aircraft: [testPlane] });
+      }
+
       const enabledUntil = (globalThis as any).__devTestEnabledUntil as number | null;
       const serverStartEnabled = devTestStart !== null && now - devTestStart <= 10000;
       const isEnabled = (enabledUntil && now <= enabledUntil) || serverStartEnabled;
