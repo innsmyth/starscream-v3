@@ -14,6 +14,12 @@ export default function TestToggle() {
       const json = await res.json();
       if (res.ok) {
         setStatus(`Enabled until ${new Date(json.enabledUntil).toLocaleTimeString()}`);
+        // Notify the app to fetch aircraft immediately
+        try {
+          window.dispatchEvent(new Event("testPlaneEnabled"));
+        } catch (e) {
+          // ignore
+        }
       } else {
         setStatus(`Error: ${json.error || res.status}`);
       }

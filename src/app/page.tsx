@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import SlideHolder from "./components/SlideHolder";
 import { PlaneAnimation } from "./components/PlaneAnimation";
 import { SatelliteAnimation } from "./components/SatelliteAnimation";
@@ -62,7 +62,7 @@ export default function Home() {
     },
   ];
 
-  const getPlanesAround = async () => {
+  const getPlanesAround = useCallback(async () => {
     try {
       const planesAround = await fetch("/api/aircraft");
       const response = await planesAround.json();
@@ -114,7 +114,7 @@ export default function Home() {
     } catch (error) {
       console.error("Failed to fetch aircraft data", error);
     }
-  };
+  }, [/* stable: CENTER_LAT, CENTER_LON, RADIUS_KM are module constants */]);
 
   const getSatellitesAround = async () => {
     try {
@@ -179,6 +179,19 @@ export default function Home() {
     }, 10000);
     return () => clearInterval(planeInterval);
   }, []);
+
+  // Listen for a test-plane-enabled event (dispatched by TestToggle) and fetch immediately
+  useEffect(() => {
+    const handler = () => {
+      try {
+        getPlanesAround();
+      } catch (e) {
+        console.error("Error handling testPlaneEnabled event", e);
+      }
+    };
+    window.addEventListener("testPlaneEnabled", handler);
+    return () => window.removeEventListener("testPlaneEnabled", handler);
+  }, [getPlanesAround]);
 
   useEffect(() => {
     getSatellitesAround();
