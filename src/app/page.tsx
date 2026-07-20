@@ -87,6 +87,8 @@ export default function Home() {
 
       if (planeDistances.length === 0) {
         setStatePlaneData(null);
+        // clear current callsign so a re-enabled test plane will trigger fetch
+        currentCallsign.current = "";
         return;
       }
 
