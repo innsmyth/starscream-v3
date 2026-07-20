@@ -24,25 +24,11 @@ export const isEnvTogglePresent = (): boolean => {
   return v === "1" || v === "true";
 };
 
-// Called to observe the env toggle; returns whether the toggle window is still active
-export const observeEnvToggleWindow = (windowMs = ENV_WINDOW_MS): boolean => {
-  if (!isEnvTogglePresent()) return false;
-  const now = Date.now();
-  if (!envObservedAt) envObservedAt = now;
-  return now - envObservedAt <= windowMs;
-};
-
+// Test plane is enabled only via enableTestPlane (enabledUntil).
 export const isTestPlaneEnabled = (): boolean => {
   if (!isTestMode()) return false;
   const now = Date.now();
-  // enabledUntil wins
-  if (enabledUntil && now <= enabledUntil) return true;
-  // env toggle window
-  if (isEnvTogglePresent()) {
-    if (!envObservedAt) envObservedAt = now;
-    return now - envObservedAt <= ENV_WINDOW_MS;
-  }
-  return false;
+  return enabledUntil !== null && now <= enabledUntil;
 };
 
 export const resetTestFlags = () => {
