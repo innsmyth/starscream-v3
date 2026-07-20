@@ -15,6 +15,25 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // In development return a mock flight route so the UI can display the test plane
+    if (process.env.NODE_ENV !== "production") {
+      const mock = {
+        response: {
+          flightroute: {
+            origin: {
+              municipality: "Test Origin",
+              iata_code: (process.env.NEXT_PUBLIC_LOCAL_AIRPORT_CODES || "").split(",")[0] || "TST",
+            },
+            destination: {
+              municipality: "Test Destination",
+              iata_code: "DST",
+            },
+          },
+        },
+      };
+
+      return NextResponse.json(mock);
+    }
     // Fetch data from the external API
     const flightDetails = await fetch(`${FLIGHT_DETAILS_URL}${callsign}`);
 
