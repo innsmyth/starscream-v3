@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function TestToggle() {
   const [status, setStatus] = useState<string>("");
   const isTestMode = (process.env.NEXT_PUBLIC_APP_MODE || "").toLowerCase() === "test";
+  const refreshTimer = useRef<number | null>(null);
 
   if (!isTestMode) return null;
 
@@ -17,6 +18,16 @@ export default function TestToggle() {
         // Notify the app to fetch aircraft immediately
         try {
           window.dispatchEvent(new Event("testPlaneEnabled"));
+        } catch (e) {
+          // ignore
+        }
+        // Schedule a refresh when the server-side window expires so the UI hides the plane
+        try {
+          if (refreshTimer.current) window.clearTimeout(refreshTimer.current);
+          const seconds = json.seconds || 10;
+          refreshTimer.current = window.setTimeout(() => {
+            try { window.dispatchEvent(new Event("testPlaneEnabled")); } catch (e) {}
+          }, seconds * 1000 + 500) as unknown as number;
         } catch (e) {
           // ignore
         }
@@ -37,6 +48,16 @@ export default function TestToggle() {
         setStatus(`Enabled satellite until ${new Date(json.enabledUntil).toLocaleTimeString()}`);
         try {
           window.dispatchEvent(new Event("testSatelliteEnabled"));
+        } catch (e) {
+          // ignore
+        }
+        // Schedule a refresh when the server-side window expires so the UI hides the satellite
+        try {
+          if (refreshTimer.current) window.clearTimeout(refreshTimer.current);
+          const seconds = json.seconds || 10;
+          refreshTimer.current = window.setTimeout(() => {
+            try { window.dispatchEvent(new Event("testSatelliteEnabled")); } catch (e) {}
+          }, seconds * 1000 + 500) as unknown as number;
         } catch (e) {
           // ignore
         }
