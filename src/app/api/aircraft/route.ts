@@ -4,7 +4,7 @@ const API_URL = process.env.LOCAL_ADSB_URL || "";
 
 // Module-level timestamp marking when the dev test plane became available.
 // This will be used to limit the test plane to a 10 second window after server start.
-let devTestStart: number | null = devTestStart ?? Date.now();
+let devTestStart: number | null = Date.now();
 
 export async function GET() {
   try {
