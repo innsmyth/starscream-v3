@@ -89,13 +89,13 @@ export default function Home() {
         setStatePlaneData(null);
         // clear current callsign so a re-enabled test plane will trigger fetch
         currentCallsign.current = "";
-        return;
+        return false;
       }
 
       try {
         const nearestPlaneCallsign = planeDistances[0]?.flight.trim();
         if (currentCallsign.current === nearestPlaneCallsign) {
-          return;
+          return true;
         }
         currentCallsign.current = nearestPlaneCallsign;
         const flightDetails = await fetch(
@@ -107,14 +107,17 @@ export default function Home() {
           const flightRoute = flightInfo.response.flightroute;
           console.log("Flight route:", flightRoute);
           setStatePlaneData(flightRoute);
+          return true;
         } else {
           console.error("Error fetching flight details:", flightInfo.error);
+          return false;
         }
       } catch (error) {
         console.error("Failed to fetch aircraft data", error);
       }
     } catch (error) {
       console.error("Failed to fetch aircraft data", error);
+      return false;
     }
   }, [/* stable: CENTER_LAT, CENTER_LON, RADIUS_KM are module constants */]);
 
@@ -144,7 +147,7 @@ export default function Home() {
       if (satelliteData.length === 0) {
         setStateSatelliteData(null);
         currentSatellite.current = null;
-        return;
+        return false;
       }
 
       try {
@@ -159,11 +162,13 @@ export default function Home() {
         } else {
           console.error("Error fetching nearest satellite details:", response.error);
         }
+        return true;
       } catch (error) {
         console.error("Failed to fetch starship data", error);
       }
     } catch (error) {
       console.error("Failed to fetch starship data", error);
+      return false;
     }
   }, []);
 
@@ -185,28 +190,120 @@ export default function Home() {
 
   // Listen for a test-plane-enabled event (dispatched by TestToggle) and fetch immediately
   useEffect(() => {
-    const handler = () => {
+    // When testPlaneEnabled fires fetch immediately and schedule clear based on server enabledUntil
+    let refreshTimer: number | null = null;
+    let pollTimer: number | null = null;
+    let clearStateTimer: number | null = null;
+    const handler = (ev: Event) => {
       try {
+        const detail = (ev as CustomEvent)?.detail || {};
+        const enabledUntil = detail.enabledUntil;
+        const seconds = detail.seconds || 10;
+        console.debug("testPlaneEnabled: scheduling fetch/poll, seconds=", seconds, "at", new Date().toLocaleTimeString());
         getPlanesAround();
+        if (refreshTimer) window.clearTimeout(refreshTimer);
+        try {
+          const msRemaining = enabledUntil ? Math.max(0, enabledUntil - Date.now()) : Math.max(0, (seconds || 10) * 1000);
+          refreshTimer = window.setTimeout(() => { getPlanesAround(); refreshTimer = null; }, msRemaining + 200) as unknown as number;
+          if (clearStateTimer) window.clearTimeout(clearStateTimer);
+          clearStateTimer = window.setTimeout(() => {
+            console.debug("testPlaneEnabled: clearing plane UI fallback at", new Date().toLocaleTimeString());
+            setStatePlaneData(null);
+            currentCallsign.current = "";
+            clearStateTimer = null;
+          }, msRemaining + 500) as unknown as number;
+        } catch (e) {
+          // ignore
+        }
+
+        // Poll as a fallback until the plane disappears
+        let elapsed = 0;
+        const pollInterval = 1000;
+        const maxMs = (seconds + 5) * 1000;
+        if (pollTimer) window.clearInterval(pollTimer);
+        pollTimer = window.setInterval(async () => {
+          try {
+            elapsed += pollInterval;
+            const found = await getPlanesAround();
+            if (!found || elapsed >= maxMs) {
+              if (pollTimer) window.clearInterval(pollTimer);
+              pollTimer = null;
+            }
+          } catch (e) {
+            if (pollTimer) window.clearInterval(pollTimer);
+            pollTimer = null;
+          }
+        }, pollInterval) as unknown as number;
       } catch (e) {
         console.error("Error handling testPlaneEnabled event", e);
       }
     };
-    window.addEventListener("testPlaneEnabled", handler);
-    return () => window.removeEventListener("testPlaneEnabled", handler);
+    window.addEventListener("testPlaneEnabled", handler as EventListener);
+    return () => {
+      window.removeEventListener("testPlaneEnabled", handler as EventListener);
+      if (refreshTimer) window.clearTimeout(refreshTimer);
+      if (pollTimer) window.clearInterval(pollTimer as any);
+      if (clearStateTimer) window.clearTimeout(clearStateTimer);
+    };
   }, [getPlanesAround]);
 
   // Listen for test-satellite-enabled event and fetch satellites immediately
   useEffect(() => {
-    const handler = () => {
+    let refreshTimer: number | null = null;
+    let pollTimer: number | null = null;
+    let clearStateTimer: number | null = null;
+    const handler = (ev: Event) => {
       try {
+        const detail = (ev as CustomEvent)?.detail || {};
+        const seconds = detail.seconds || 10;
+        // Fire an immediate fetch to show the test satellite
+        console.debug("testSatelliteEnabled: scheduling fetch/poll, seconds=", seconds, "at", new Date().toLocaleTimeString());
         getSatellitesAround();
+        if (refreshTimer) window.clearTimeout(refreshTimer);
+        // Schedule a single re-check after the nominal window (seconds)
+        try {
+          const msRemaining = Math.max(0, (seconds || 10) * 1000);
+          refreshTimer = window.setTimeout(() => { getSatellitesAround(); refreshTimer = null; }, msRemaining + 200) as unknown as number;
+          // Also schedule a guaranteed client-side clear of UI state as a fallback
+          if (clearStateTimer) window.clearTimeout(clearStateTimer);
+          clearStateTimer = window.setTimeout(() => {
+            console.debug("testSatelliteEnabled: clearing satellite UI fallback at", new Date().toLocaleTimeString());
+            setStateSatelliteData(null);
+            currentSatellite.current = null;
+            clearStateTimer = null;
+          }, msRemaining + 500) as unknown as number;
+        } catch (e) {
+          // ignore
+        }
+        // As a fallback, poll every 1s for up to (seconds + 5) seconds to confirm the satellite disappears
+        let elapsed = 0;
+        const pollInterval = 1000;
+        const maxMs = (seconds + 5) * 1000;
+        if (pollTimer) window.clearInterval(pollTimer);
+        pollTimer = window.setInterval(async () => {
+          try {
+            elapsed += pollInterval;
+            const found = await getSatellitesAround();
+            if (!found || elapsed >= maxMs) {
+              if (pollTimer) window.clearInterval(pollTimer);
+              pollTimer = null;
+            }
+          } catch (e) {
+            if (pollTimer) window.clearInterval(pollTimer);
+            pollTimer = null;
+          }
+        }, pollInterval) as unknown as number;
       } catch (e) {
         console.error("Error handling testSatelliteEnabled event", e);
       }
     };
-    window.addEventListener("testSatelliteEnabled", handler);
-    return () => window.removeEventListener("testSatelliteEnabled", handler);
+    window.addEventListener("testSatelliteEnabled", handler as EventListener);
+    return () => {
+      window.removeEventListener("testSatelliteEnabled", handler as EventListener);
+      if (refreshTimer) window.clearTimeout(refreshTimer);
+      if (pollTimer) window.clearInterval(pollTimer as any);
+      if (clearStateTimer) window.clearTimeout(clearStateTimer);
+    };
   }, [getSatellitesAround]);
 
   useEffect(() => {

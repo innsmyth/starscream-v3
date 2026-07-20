@@ -1,33 +1,23 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState } from "react";
 
 export default function TestToggle() {
-  const [status, setStatus] = useState<string>("");
+  const [status, setStatus] = useState<string>('');
   const isTestMode = (process.env.NEXT_PUBLIC_APP_MODE || "").toLowerCase() === "test";
-  const refreshTimer = useRef<number | null>(null);
+  // No timers here; page.tsx will schedule refresh based on event details
 
   if (!isTestMode) return null;
 
   const enableTest = async () => {
     try {
       setStatus("Enabling test plane...");
-      const res = await fetch("/api/devTest?seconds=10");
+      const res = await fetch("/api/devTest?type=plane&seconds=10");
       const json = await res.json();
       if (res.ok) {
-        setStatus(`Enabled until ${new Date(json.enabledUntil).toLocaleTimeString()}`);
-        // Notify the app to fetch aircraft immediately
+        setStatus(`Enabled plane until ${new Date(json.enabledUntil).toLocaleTimeString()}`);
+        // Notify the app to fetch aircraft immediately and include the server-side enabledUntil
         try {
-          window.dispatchEvent(new Event("testPlaneEnabled"));
-        } catch (e) {
-          // ignore
-        }
-        // Schedule a refresh when the server-side window expires so the UI hides the plane
-        try {
-          if (refreshTimer.current) window.clearTimeout(refreshTimer.current);
-          const seconds = json.seconds || 10;
-          refreshTimer.current = window.setTimeout(() => {
-            try { window.dispatchEvent(new Event("testPlaneEnabled")); } catch (e) {}
-          }, seconds * 1000 + 500) as unknown as number;
+          window.dispatchEvent(new CustomEvent("testPlaneEnabled", { detail: { enabledUntil: json.enabledUntil, seconds: json.seconds } }));
         } catch (e) {
           // ignore
         }
@@ -46,18 +36,9 @@ export default function TestToggle() {
       const json = await res.json();
       if (res.ok) {
         setStatus(`Enabled satellite until ${new Date(json.enabledUntil).toLocaleTimeString()}`);
+        // Notify the app to fetch satellites immediately and include the server-side enabledUntil
         try {
-          window.dispatchEvent(new Event("testSatelliteEnabled"));
-        } catch (e) {
-          // ignore
-        }
-        // Schedule a refresh when the server-side window expires so the UI hides the satellite
-        try {
-          if (refreshTimer.current) window.clearTimeout(refreshTimer.current);
-          const seconds = json.seconds || 10;
-          refreshTimer.current = window.setTimeout(() => {
-            try { window.dispatchEvent(new Event("testSatelliteEnabled")); } catch (e) {}
-          }, seconds * 1000 + 500) as unknown as number;
+          window.dispatchEvent(new CustomEvent("testSatelliteEnabled", { detail: { enabledUntil: json.enabledUntil, seconds: json.seconds } }));
         } catch (e) {
           // ignore
         }
@@ -80,7 +61,7 @@ export default function TestToggle() {
       <div style={{ height: 8 }} />
       <button
         onClick={enableTestSatellite}
-        className="bg-green-600 text-white px-3 py-1 rounded mt-2"
+        className="bg-red-600 text-white px-3 py-1 rounded mt-2"
       >
         Enable Test Satellite (10s)
       </button>

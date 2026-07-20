@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Only return a mock flight route when running in explicit test mode.
+    // Return mock flight route in test mode, otherwise fetch from external API
     if (process.env.NODE_ENV !== "production" && testMode.isTestMode()) {
       const mock = {
         response: {
@@ -32,25 +32,12 @@ export async function GET(request: NextRequest) {
           },
         },
       };
-
       return NextResponse.json(mock);
     }
-    // Fetch data from the external API
+
     const flightDetails = await fetch(`${FLIGHT_DETAILS_URL}${callsign}`);
-
-    // Handle unsuccessful requests
-    if (!flightDetails.ok) {
-      return NextResponse.json(
-        { error: "Failed to fetch flight details" },
-        { status: flightDetails.status }
-      );
-    }
-
-    // Parse the JSON data from the response
-    const flightInfo = await flightDetails.json();
-
-    // Return the data as a JSON response
-    return NextResponse.json(flightInfo);
+    if (!flightDetails.ok) return NextResponse.json({ error: "Failed to fetch flight details" }, { status: flightDetails.status });
+    return NextResponse.json(await flightDetails.json());
   } catch (error) {
     console.error("Error fetching flight details:", error); // Log the error for debugging
     return NextResponse.json(

@@ -1,5 +1,5 @@
-import assert from "assert";
-import * as testMode from "../src/lib/testMode";
+const assert = require("assert");
+const testMode = require("../src/lib/testMode");
 
 async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));

@@ -5,8 +5,9 @@ const API_URL = process.env.LOCAL_ADSB_URL || "";
 
 export async function GET() {
   try {
-    // Only show the test plane when explicitly running in test mode
-    if (testMode.isTestMode()) {
+    // If running in test mode return the test plane (when enabled) or an empty list
+    const isTest = testMode.isTestMode();
+    if (isTest) {
       const now = Date.now();
       const CENTER_LAT = parseFloat(process.env.NEXT_PUBLIC_CENTER_LAT || "51.47674088740635");
       const CENTER_LON = parseFloat(process.env.NEXT_PUBLIC_CENTER_LON || "-0.23339838187103154");
@@ -21,11 +22,7 @@ export async function GET() {
         seen: now,
       };
 
-      if (testMode.isTestPlaneEnabled()) {
-        return NextResponse.json({ aircraft: [testPlane] });
-      }
-
-      return NextResponse.json({ aircraft: [] });
+      return NextResponse.json({ aircraft: testMode.isTestPlaneEnabled() ? [testPlane] : [] });
     }
 
     // Fetch data from the external API in production
@@ -39,11 +36,8 @@ export async function GET() {
       );
     }
 
-    // Parse the JSON data from the response
-    const data = await response.json();
-
-    // Return the data as a JSON response
-    return NextResponse.json(data);
+    // Return the fetched data as JSON
+    return NextResponse.json(await response.json());
   } catch (error) {
     // Handle any errors that occur during the fetch
     return NextResponse.json(

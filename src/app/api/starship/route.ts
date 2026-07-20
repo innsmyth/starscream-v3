@@ -10,12 +10,12 @@ const API_KEY = process.env.API_KEY_N2YO || "";
 
 export async function GET() {
   try {
-    // In test mode, return a mock satellite when explicitly enabled
-    if (process.env.NODE_ENV !== "production" && testMode.isTestMode() && testMode.isTestSatelliteEnabled()) {
-      const now = Date.now();
+    // In test mode return mock satellite when enabled, otherwise fetch external data
+    const isTest = process.env.NODE_ENV !== "production" && testMode.isTestMode();
+    if (isTest && testMode.isTestSatelliteEnabled()) {
       const lat = parseFloat(process.env.NEXT_PUBLIC_CENTER_LAT || "51.47674088740635");
       const lon = parseFloat(process.env.NEXT_PUBLIC_CENTER_LON || "-0.23339838187103154");
-      const mock = {
+      return NextResponse.json({
         above: [
           {
             satid: 99999,
@@ -27,27 +27,13 @@ export async function GET() {
             satlng: lon + 0.0001,
           },
         ],
-      };
-      return NextResponse.json(mock);
+      });
     }
 
     const API_URL = `${BASE_URL}${CENTER_LAT}/${CENTER_LON}/${CENTER_ALT}/${RADIUS_KM}/0/&apiKey=${API_KEY}`;
-    // Fetch data from the external API
     const response = await fetch(API_URL);
-
-    // Handle unsuccessful requests
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: "Failed to fetch starship data" },
-        { status: response.status }
-      );
-    }
-
-    // Parse the JSON data from the response
-    const data = await response.json();
-
-    // Return the data as a JSON response
-    return NextResponse.json(data);
+    if (!response.ok) return NextResponse.json({ error: "Failed to fetch starship data" }, { status: response.status });
+    return NextResponse.json(await response.json());
   } catch (error) {
     // Handle any errors that occur during the fetch
     return NextResponse.json(
