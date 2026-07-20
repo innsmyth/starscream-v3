@@ -12,10 +12,16 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = request.nextUrl;
     const seconds = Math.max(1, parseInt(searchParams.get("seconds") || "10", 10));
+    const type = (searchParams.get("type") || "plane").toLowerCase();
+
+    if (type === "satellite" || type === "sat" || type === "starship") {
+      const until = testMode.enableTestSatellite(seconds);
+      return NextResponse.json({ type: "satellite", enabledUntil: until, seconds });
+    }
 
     const until = testMode.enableTestPlane(seconds);
 
-    return NextResponse.json({ enabledUntil: until, seconds });
+    return NextResponse.json({ type: "plane", enabledUntil: until, seconds });
   } catch (err) {
     return NextResponse.json({ error: "Failed to enable dev test plane" }, { status: 500 });
   }

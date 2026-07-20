@@ -118,7 +118,7 @@ export default function Home() {
     }
   }, [/* stable: CENTER_LAT, CENTER_LON, RADIUS_KM are module constants */]);
 
-  const getSatellitesAround = async () => {
+  const getSatellitesAround = useCallback(async () => {
     try {
       const satellitesAround = await fetch("/api/starship");
       const response = await satellitesAround.json();
@@ -143,6 +143,7 @@ export default function Home() {
 
       if (satelliteData.length === 0) {
         setStateSatelliteData(null);
+        currentSatellite.current = null;
         return;
       }
 
@@ -164,7 +165,7 @@ export default function Home() {
     } catch (error) {
       console.error("Failed to fetch starship data", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const timeInterval = setInterval(() => {
@@ -194,6 +195,19 @@ export default function Home() {
     window.addEventListener("testPlaneEnabled", handler);
     return () => window.removeEventListener("testPlaneEnabled", handler);
   }, [getPlanesAround]);
+
+  // Listen for test-satellite-enabled event and fetch satellites immediately
+  useEffect(() => {
+    const handler = () => {
+      try {
+        getSatellitesAround();
+      } catch (e) {
+        console.error("Error handling testSatelliteEnabled event", e);
+      }
+    };
+    window.addEventListener("testSatelliteEnabled", handler);
+    return () => window.removeEventListener("testSatelliteEnabled", handler);
+  }, [getSatellitesAround]);
 
   useEffect(() => {
     getSatellitesAround();

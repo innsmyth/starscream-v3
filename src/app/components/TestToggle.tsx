@@ -28,6 +28,26 @@ export default function TestToggle() {
     }
   };
 
+  const enableTestSatellite = async () => {
+    try {
+      setStatus("Enabling test satellite...");
+      const res = await fetch("/api/devTest?type=satellite&seconds=10");
+      const json = await res.json();
+      if (res.ok) {
+        setStatus(`Enabled satellite until ${new Date(json.enabledUntil).toLocaleTimeString()}`);
+        try {
+          window.dispatchEvent(new Event("testSatelliteEnabled"));
+        } catch (e) {
+          // ignore
+        }
+      } else {
+        setStatus(`Error: ${json.error || res.status}`);
+      }
+    } catch (err) {
+      setStatus(`Request failed: ${err}`);
+    }
+  };
+
   return (
     <div style={{ position: "fixed", top: 12, right: 12, zIndex: 60 }}>
       <button
@@ -35,6 +55,13 @@ export default function TestToggle() {
         className="bg-blue-600 text-white px-3 py-1 rounded"
       >
         Enable Test Plane (10s)
+      </button>
+      <div style={{ height: 8 }} />
+      <button
+        onClick={enableTestSatellite}
+        className="bg-green-600 text-white px-3 py-1 rounded mt-2"
+      >
+        Enable Test Satellite (10s)
       </button>
       {status && <div className="text-white mt-2">{status}</div>}
     </div>

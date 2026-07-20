@@ -35,3 +35,22 @@ export const resetTestFlags = () => {
   enabledUntil = null;
   envObservedAt = null;
 };
+
+// Satellite-specific flags
+let enabledSatelliteUntil: number | null = null;
+
+export const enableTestSatellite = (seconds = 10): number => {
+  const until = Date.now() + Math.max(1, seconds) * 1000;
+  enabledSatelliteUntil = until;
+  return until;
+};
+
+export const isTestSatelliteEnabled = (): boolean => {
+  if (!isTestMode()) return false;
+  const now = Date.now();
+  return enabledSatelliteUntil !== null && now <= enabledSatelliteUntil;
+};
+
+export const resetSatelliteFlag = () => {
+  enabledSatelliteUntil = null;
+};

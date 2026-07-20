@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import * as testMode from "../../../lib/testMode";
 export const revalidate = 0;
 const BASE_URL = process.env.NEXT_PUBLIC_ORBIT_DETAILS_URL || "";
 const CENTER_LAT = process.env.NEXT_PUBLIC_CENTER_LAT || "";
@@ -9,7 +10,28 @@ const API_KEY = process.env.API_KEY_N2YO || "";
 
 export async function GET() {
   try {
-    const API_URL = `${BASE_URL}${CENTER_LAT}/${CENTER_LON}/${CENTER_ALT}/${RADIUS_KM}/0/&apiKey=${API_KEY}`
+    // In test mode, return a mock satellite when explicitly enabled
+    if (process.env.NODE_ENV !== "production" && testMode.isTestMode() && testMode.isTestSatelliteEnabled()) {
+      const now = Date.now();
+      const lat = parseFloat(process.env.NEXT_PUBLIC_CENTER_LAT || "51.47674088740635");
+      const lon = parseFloat(process.env.NEXT_PUBLIC_CENTER_LON || "-0.23339838187103154");
+      const mock = {
+        above: [
+          {
+            satid: 99999,
+            satname: "TEST_SAT",
+            intDesignator: "TEST-1",
+            launchDate: new Date().toISOString(),
+            satalt: 400,
+            satlat: lat + 0.0001,
+            satlng: lon + 0.0001,
+          },
+        ],
+      };
+      return NextResponse.json(mock);
+    }
+
+    const API_URL = `${BASE_URL}${CENTER_LAT}/${CENTER_LON}/${CENTER_ALT}/${RADIUS_KM}/0/&apiKey=${API_KEY}`;
     // Fetch data from the external API
     const response = await fetch(API_URL);
 
