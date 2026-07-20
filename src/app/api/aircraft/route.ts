@@ -31,9 +31,21 @@ export async function GET() {
       };
 
       // Environment toggle to force the test plane on while developing or testing.
+      // If the environment toggle is set (npm run test), allow the test plane
+      // but only for a short window (10s) after the server first observes the
+      // toggle. This prevents a persistent env var from showing the plane
+      // indefinitely.
       const envForce = (process.env.NEXT_PUBLIC_ENABLE_TEST_PLANE || "").toLowerCase();
       if (envForce === "1" || envForce === "true") {
-        return NextResponse.json({ aircraft: [testPlane] });
+        // Track when the env toggle was first observed in this server process.
+        if (!(globalThis as any).__devEnvStart) {
+          (globalThis as any).__devEnvStart = now;
+        }
+        const devEnvStart = (globalThis as any).__devEnvStart as number;
+        if (now - devEnvStart <= 10000) {
+          return NextResponse.json({ aircraft: [testPlane] });
+        }
+        // fall through if env toggle window expired
       }
 
       const enabledUntil = (globalThis as any).__devTestEnabledUntil as number | null;
