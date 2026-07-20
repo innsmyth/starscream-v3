@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import SlideHolder from "./components/SlideHolder";
 import { PlaneAnimation } from "./components/PlaneAnimation";
 import { SatelliteAnimation } from "./components/SatelliteAnimation";
+import TestToggle from "./components/TestToggle";
 import { haversineDistance } from "./lib/haversine";
 
 // Use sensible defaults when NEXT_PUBLIC_* env vars aren't provided so the dev UI works
@@ -190,6 +191,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full bg-black">
+      <TestToggle />
       {(statePlaneData && <PlaneAnimation />) || (stateSatelliteData && <SatelliteAnimation />)}
       <SlideHolder
         slides={statePlaneData ? planeSlide : (stateSatelliteData ? satelliteSlide : slides)}
