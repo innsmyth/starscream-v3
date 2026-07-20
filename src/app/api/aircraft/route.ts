@@ -2,13 +2,20 @@ import { NextResponse } from "next/server";
 export const revalidate = 0;
 const API_URL = process.env.LOCAL_ADSB_URL || "";
 
-// Module-level timestamp marking when the dev test plane became available.
-// This will be used to limit the test plane to a 10 second window after server start.
+// Module-level timestamp marking when the dev test plane became available at server start.
+// We still track the server-start time as a fallback, but a dedicated API can set
+// a global enable-until timestamp to trigger the test plane on demand.
 let devTestStart: number | null = Date.now();
+
+// Expose a well-known global flag so other API routes can enable the dev test plane
+// for a short duration. Stored as a numeric timestamp (ms since epoch) on globalThis.
+;(globalThis as any).__devTestEnabledUntil = (globalThis as any).__devTestEnabledUntil || null;
 
 export async function GET() {
   try {
-    // In development return a deterministic test plane for the first 10 seconds
+    // In development return a deterministic test plane when enabled either by
+    // server-start fallback (first 10s) or when explicitly enabled via the
+    // /api/devTest endpoint which sets globalThis.__devTestEnabledUntil.
     if (process.env.NODE_ENV !== "production") {
       const now = Date.now();
       const CENTER_LAT = parseFloat(process.env.NEXT_PUBLIC_CENTER_LAT || "51.47674088740635");
@@ -24,13 +31,15 @@ export async function GET() {
         seen: now,
       };
 
-      if (devTestStart === null) devTestStart = now;
-      // Only return the test plane for the first 10 seconds after devTestStart
-      if (now - devTestStart <= 10000) {
+      const enabledUntil = (globalThis as any).__devTestEnabledUntil as number | null;
+      const serverStartEnabled = devTestStart !== null && now - devTestStart <= 10000;
+      const isEnabled = (enabledUntil && now <= enabledUntil) || serverStartEnabled;
+
+      if (isEnabled) {
         return NextResponse.json({ aircraft: [testPlane] });
       }
 
-      // After 10s return an empty aircraft list so the UI no longer shows the test plane
+      // When not enabled return an empty aircraft list so the UI won't show the test plane
       return NextResponse.json({ aircraft: [] });
     }
 
