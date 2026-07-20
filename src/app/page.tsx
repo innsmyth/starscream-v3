@@ -5,9 +5,10 @@ import { PlaneAnimation } from "./components/PlaneAnimation";
 import { SatelliteAnimation } from "./components/SatelliteAnimation";
 import { haversineDistance } from "./lib/haversine";
 
-const CENTER_LAT = parseFloat(process.env.NEXT_PUBLIC_CENTER_LAT || "0");
-const CENTER_LON = parseFloat(process.env.NEXT_PUBLIC_CENTER_LON || "0");
-const RADIUS_KM = parseFloat(process.env.NEXT_PUBLIC_RADIUS_KM || "0");
+// Use sensible defaults when NEXT_PUBLIC_* env vars aren't provided so the dev UI works
+const CENTER_LAT = parseFloat(process.env.NEXT_PUBLIC_CENTER_LAT || "51.47674088740635");
+const CENTER_LON = parseFloat(process.env.NEXT_PUBLIC_CENTER_LON || "-0.23339838187103154");
+const RADIUS_KM = parseFloat(process.env.NEXT_PUBLIC_RADIUS_KM || "2");
 const LOCAL_AIRPORT_LIST = (process.env.NEXT_PUBLIC_LOCAL_AIRPORT_CODES || "").split(",");
 
 export default function Home() {
