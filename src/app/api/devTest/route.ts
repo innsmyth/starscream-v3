@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as testMode from "../../../lib/testMode";
 
 // GET /api/devTest?seconds=10 - enables the dev test plane for the specified number
 // of seconds (default 10). Returns the enable-until timestamp.
 export async function GET(request: NextRequest) {
   try {
-    if (process.env.NODE_ENV === "production") {
-      return NextResponse.json({ error: "Not allowed in production" }, { status: 403 });
-    }
-
     // Only allow this endpoint when running in explicit test mode
     if (((process.env.NEXT_PUBLIC_APP_MODE || "").toLowerCase() !== "test")) {
       return NextResponse.json({ error: "devTest endpoint only available in test mode" }, { status: 403 });
@@ -15,11 +12,8 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = request.nextUrl;
     const seconds = Math.max(1, parseInt(searchParams.get("seconds") || "10", 10));
-    const now = Date.now();
-    const until = now + seconds * 1000;
 
-    // Store on globalThis so aircraft route can read it
-    (globalThis as any).__devTestEnabledUntil = until;
+    const until = testMode.enableTestPlane(seconds);
 
     return NextResponse.json({ enabledUntil: until, seconds });
   } catch (err) {

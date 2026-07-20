@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as testMode from "../../../lib/testMode";
 
 const FLIGHT_DETAILS_URL = process.env.NEXT_PUBLIC_FLIGHT_DETAILS_URL || "";
 
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Only return a mock flight route when running in explicit test mode.
-    if (process.env.NODE_ENV !== "production" && (process.env.NEXT_PUBLIC_APP_MODE || "").toLowerCase() === "test") {
+    if (process.env.NODE_ENV !== "production" && testMode.isTestMode()) {
       const mock = {
         response: {
           flightroute: {

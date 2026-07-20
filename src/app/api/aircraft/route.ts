@@ -1,18 +1,12 @@
 import { NextResponse } from "next/server";
+import * as testMode from "../../../lib/testMode";
 export const revalidate = 0;
 const API_URL = process.env.LOCAL_ADSB_URL || "";
 
-// A dedicated API can set a global enable-until timestamp to trigger the test plane on demand.
-
-// Expose a well-known global flag so other API routes can enable the dev test plane
-// for a short duration. Stored as a numeric timestamp (ms since epoch) on globalThis.
-;(globalThis as any).__devTestEnabledUntil = (globalThis as any).__devTestEnabledUntil || null;
-
 export async function GET() {
   try {
-    // Only allow the test plane in explicit "test" mode. Do not show in normal
-    // development. Test mode is opt-in via NEXT_PUBLIC_APP_MODE=test.
-    if (process.env.NODE_ENV !== "production" && (process.env.NEXT_PUBLIC_APP_MODE || "").toLowerCase() === "test") {
+    // Only show the test plane when explicitly running in test mode
+    if (testMode.isTestMode()) {
       const now = Date.now();
       const CENTER_LAT = parseFloat(process.env.NEXT_PUBLIC_CENTER_LAT || "51.47674088740635");
       const CENTER_LON = parseFloat(process.env.NEXT_PUBLIC_CENTER_LON || "-0.23339838187103154");
@@ -27,33 +21,10 @@ export async function GET() {
         seen: now,
       };
 
-      // Environment toggle to force the test plane on while developing or testing.
-      // If the environment toggle is set (npm run test), allow the test plane
-      // but only for a short window (10s) after the server first observes the
-      // toggle. This prevents a persistent env var from showing the plane
-      // indefinitely.
-      const envForce = (process.env.NEXT_PUBLIC_ENABLE_TEST_PLANE || "").toLowerCase();
-      if (envForce === "1" || envForce === "true") {
-        // Track when the env toggle was first observed in this server process.
-        if (!(globalThis as any).__devEnvStart) {
-          (globalThis as any).__devEnvStart = now;
-        }
-        const devEnvStart = (globalThis as any).__devEnvStart as number;
-        if (now - devEnvStart <= 10000) {
-          return NextResponse.json({ aircraft: [testPlane] });
-        }
-        // fall through if env toggle window expired
-      }
-
-      const enabledUntil = (globalThis as any).__devTestEnabledUntil as number | null;
-      const serverStartEnabled = devTestStart !== null && now - devTestStart <= 10000;
-      const isEnabled = (enabledUntil && now <= enabledUntil) || serverStartEnabled;
-
-      if (isEnabled) {
+      if (testMode.isTestPlaneEnabled()) {
         return NextResponse.json({ aircraft: [testPlane] });
       }
 
-      // When not enabled return an empty aircraft list so the UI won't show the test plane
       return NextResponse.json({ aircraft: [] });
     }
 
