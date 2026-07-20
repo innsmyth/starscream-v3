@@ -15,8 +15,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // In development return a mock flight route so the UI can display the test plane
-    if (process.env.NODE_ENV !== "production") {
+    // Only return a mock flight route when running in explicit test mode.
+    if (process.env.NODE_ENV !== "production" && (process.env.NEXT_PUBLIC_APP_MODE || "").toLowerCase() === "test") {
       const mock = {
         response: {
           flightroute: {

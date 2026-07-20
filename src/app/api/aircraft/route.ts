@@ -2,10 +2,7 @@ import { NextResponse } from "next/server";
 export const revalidate = 0;
 const API_URL = process.env.LOCAL_ADSB_URL || "";
 
-// Module-level timestamp marking when the dev test plane became available at server start.
-// We still track the server-start time as a fallback, but a dedicated API can set
-// a global enable-until timestamp to trigger the test plane on demand.
-let devTestStart: number | null = Date.now();
+// A dedicated API can set a global enable-until timestamp to trigger the test plane on demand.
 
 // Expose a well-known global flag so other API routes can enable the dev test plane
 // for a short duration. Stored as a numeric timestamp (ms since epoch) on globalThis.
