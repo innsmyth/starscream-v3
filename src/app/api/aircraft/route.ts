@@ -13,10 +13,9 @@ let devTestStart: number | null = Date.now();
 
 export async function GET() {
   try {
-    // In development return a deterministic test plane when enabled either by
-    // server-start fallback (first 10s) or when explicitly enabled via the
-    // /api/devTest endpoint which sets globalThis.__devTestEnabledUntil.
-    if (process.env.NODE_ENV !== "production") {
+    // Only allow the test plane in explicit "test" mode. Do not show in normal
+    // development. Test mode is opt-in via NEXT_PUBLIC_APP_MODE=test.
+    if (process.env.NODE_ENV !== "production" && (process.env.NEXT_PUBLIC_APP_MODE || "").toLowerCase() === "test") {
       const now = Date.now();
       const CENTER_LAT = parseFloat(process.env.NEXT_PUBLIC_CENTER_LAT || "51.47674088740635");
       const CENTER_LON = parseFloat(process.env.NEXT_PUBLIC_CENTER_LON || "-0.23339838187103154");

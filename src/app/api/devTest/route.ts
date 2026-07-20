@@ -8,6 +8,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Not allowed in production" }, { status: 403 });
     }
 
+    // Only allow this endpoint when running in explicit test mode
+    if (((process.env.NEXT_PUBLIC_APP_MODE || "").toLowerCase() !== "test")) {
+      return NextResponse.json({ error: "devTest endpoint only available in test mode" }, { status: 403 });
+    }
+
     const { searchParams } = request.nextUrl;
     const seconds = Math.max(1, parseInt(searchParams.get("seconds") || "10", 10));
     const now = Date.now();
