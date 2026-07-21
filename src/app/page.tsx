@@ -1,3 +1,9 @@
+/*
+  Main Page
+  Displays plane or satellite test overlays and a slide panel with details.
+  Polls backend endpoints for aircraft and starship data and renders animations.
+*/
+
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
 import SlideHolder from "./components/SlideHolder";
@@ -119,7 +125,7 @@ export default function Home() {
       console.error("Failed to fetch aircraft data", error);
       return false;
     }
-  }, [/* stable: CENTER_LAT, CENTER_LON, RADIUS_KM are module constants */]);
+  }, []);
 
   const getSatellitesAround = useCallback(async () => {
     try {

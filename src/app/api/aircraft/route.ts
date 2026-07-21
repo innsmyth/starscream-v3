@@ -1,3 +1,9 @@
+/*
+ Aircraft API Route
+ Returns nearby aircraft. In test mode returns a deterministic test plane when
+ explicitly enabled via the devTest endpoint; otherwise proxies the production
+ data source configured by LOCAL_ADSB_URL.
+*/
 import { NextResponse } from "next/server";
 import * as testMode from "../../../lib/testMode";
 

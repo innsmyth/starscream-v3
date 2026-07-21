@@ -1,6 +1,8 @@
-// Centralized test-mode utilities
-// Controls whether the app is in test mode and whether the in-memory test plane
-// should be shown. Intended for local dev/test only (module-level state).
+/*
+ Test Mode Utilities
+ Centralized module that controls test-mode flags for local development. Exposes
+ functions to enable/disable a test plane and test satellite for a timed window.
+*/
 
 const ENV_WINDOW_MS = 10000; // 10 seconds
 

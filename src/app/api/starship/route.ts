@@ -1,3 +1,10 @@
+/*
+ Starship (Satellite) API Route
+ Returns nearby satellites. In test mode returns a deterministic mock
+ satellite when enabled via the devTest endpoint; otherwise proxies the
+ configured external N2YO API.
+*/
+
 import { NextResponse } from "next/server";
 import * as testMode from "../../../lib/testMode";
 

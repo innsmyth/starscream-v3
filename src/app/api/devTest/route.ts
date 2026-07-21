@@ -1,3 +1,9 @@
+/*
+ Dev Test Endpoint
+ Enables test artifacts (plane or satellite) for a fixed duration. Intended for
+ local development when NEXT_PUBLIC_APP_MODE=test. Returns the server-side
+ enabledUntil timestamp and the requested seconds.
+*/
 import { NextRequest, NextResponse } from "next/server";
 import * as testMode from "../../../lib/testMode";
 

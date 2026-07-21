@@ -1,4 +1,8 @@
-// Haversine formula to calculate distance between two lat/lon points
+/*
+ Haversine Distance Utility
+ Calculates the great-circle distance between two latitude/longitude points
+ using the haversine formula. Returns kilometers.
+*/
 export const haversineDistance = (
   lat1: number,
   lon1: number,

@@ -1,3 +1,8 @@
+/*
+ Flight Details API Route
+ Returns mocked flight route data in test mode for a deterministic demo. In
+ production it fetches flight details from the configured external service.
+*/
 import { NextRequest, NextResponse } from "next/server";
 import * as testMode from "../../../lib/testMode";
 
