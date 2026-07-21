@@ -209,7 +209,11 @@ export default function Home() {
         getPlanesAround();
         if (refreshTimer) window.clearTimeout(refreshTimer);
         try {
-          const msRemaining = enabledUntil ? Math.max(0, enabledUntil - Date.now()) : Math.max(0, (seconds || 10) * 1000);
+          // Always base client timers on the server-returned duration (seconds)
+          // rather than the absolute enabledUntil timestamp. This avoids
+          // premature clears when the client clock is ahead of the server.
+          const msRemaining = Math.max(0, (seconds || 10) * 1000);
+          console.debug("testPlaneEnabled: scheduling based on seconds, msRemaining=", msRemaining, "enabledUntil=", enabledUntil);
           refreshTimer = window.setTimeout(() => { getPlanesAround(); refreshTimer = null; }, msRemaining + 200) as unknown as number;
           if (clearStateTimer) window.clearTimeout(clearStateTimer);
           clearStateTimer = window.setTimeout(() => {
