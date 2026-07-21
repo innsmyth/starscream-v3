@@ -1,3 +1,8 @@
+/*
+ Test Suite: testMode utilities
+ Verifies enable/expiry behavior for the in-memory test flags used by the
+ development endpoints. Intended to be run locally (node).
+*/
 const assert = require("assert");
 const testMode = require("../src/lib/testMode");
 
