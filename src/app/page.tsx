@@ -209,7 +209,11 @@ export default function Home() {
         getPlanesAround();
         if (refreshTimer) window.clearTimeout(refreshTimer);
         try {
-          const msRemaining = enabledUntil ? Math.max(0, enabledUntil - Date.now()) : Math.max(0, (seconds || 10) * 1000);
+          // Use the server-returned seconds rather than the absolute enabledUntil timestamp
+          // to avoid clock-skew causing premature clears. seconds is the duration the
+          // server intended the test artifact to be visible starting from when the
+          // request was processed, so schedule based on that value.
+          const msRemaining = Math.max(0, (seconds || 10) * 1000);
           refreshTimer = window.setTimeout(() => { getPlanesAround(); refreshTimer = null; }, msRemaining + 200) as unknown as number;
           if (clearStateTimer) window.clearTimeout(clearStateTimer);
           clearStateTimer = window.setTimeout(() => {
