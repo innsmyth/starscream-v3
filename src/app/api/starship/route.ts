@@ -1,5 +1,15 @@
+/*
+ Starship (Satellite) API Route
+ Returns nearby satellites. In test mode returns a deterministic mock
+ satellite when enabled via the devTest endpoint; otherwise proxies the
+ configured external N2YO API.
+*/
+
 import { NextResponse } from "next/server";
+import * as testMode from "../../../lib/testMode";
+
 export const revalidate = 0;
+
 const BASE_URL = process.env.NEXT_PUBLIC_ORBIT_DETAILS_URL || "";
 const CENTER_LAT = process.env.NEXT_PUBLIC_CENTER_LAT || "";
 const CENTER_LON = process.env.NEXT_PUBLIC_CENTER_LON || "";
@@ -9,23 +19,37 @@ const API_KEY = process.env.API_KEY_N2YO || "";
 
 export async function GET() {
   try {
-    const API_URL = `${BASE_URL}${CENTER_LAT}/${CENTER_LON}/${CENTER_ALT}/${RADIUS_KM}/0/&apiKey=${API_KEY}`
-    // Fetch data from the external API
-    const response = await fetch(API_URL);
+    // In test mode return mock satellite when enabled, otherwise fetch external data
+    const isTest = process.env.NODE_ENV !== "production" && testMode.isTestMode();
 
-    // Handle unsuccessful requests
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: "Failed to fetch starship data" },
-        { status: response.status }
-      );
+    if (isTest && testMode.isTestSatelliteEnabled()) {
+      const lat = parseFloat(process.env.NEXT_PUBLIC_CENTER_LAT || "51.47674088740635");
+      const lon = parseFloat(process.env.NEXT_PUBLIC_CENTER_LON || "-0.23339838187103154");
+
+      return NextResponse.json({
+        above: [
+          {
+            satid: 99999,
+            satname: "TEST_SAT",
+            intDesignator: "TEST-1",
+            launchDate: new Date().toISOString(),
+            satalt: 400,
+            satlat: lat + 0.0001,
+            satlng: lon + 0.0001,
+          },
+        ],
+      });
     }
 
-    // Parse the JSON data from the response
-    const data = await response.json();
+    const API_URL = `${BASE_URL}${CENTER_LAT}/${CENTER_LON}/${CENTER_ALT}/${RADIUS_KM}/0/&apiKey=${API_KEY}`;
 
-    // Return the data as a JSON response
-    return NextResponse.json(data);
+    const response = await fetch(API_URL);
+
+    if (!response.ok) {
+      return NextResponse.json({ error: "Failed to fetch starship data" }, { status: response.status });
+    }
+
+    return NextResponse.json(await response.json());
   } catch (error) {
     // Handle any errors that occur during the fetch
     return NextResponse.json(

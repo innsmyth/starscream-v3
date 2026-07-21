@@ -1,3 +1,8 @@
+/*
+ Plane Animation
+ Presentational component that renders an animated plane SVG used for
+ testing and demo overlays in the development UI.
+*/
 interface PlaneAnimationProps {}
 
 export const PlaneAnimation = ({}: PlaneAnimationProps) => {

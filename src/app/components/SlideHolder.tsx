@@ -1,3 +1,8 @@
+/*
+ Slide Holder
+ Responsible for rendering the vertical slide UI. Uses Splide to cycle
+ informational slides (time, plane or satellite details) in the main view.
+*/
 "use client";
 import React from "react";
 import { Splide, SplideSlide } from "@splidejs/react-splide";

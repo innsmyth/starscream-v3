@@ -1,3 +1,9 @@
+/*
+ Satellite Animation
+ Simple presentational component that renders the satellite SVG animation used
+ for development/testing overlays.
+ Ensure header remains at top of this file.
+*/
 interface SatelliteAnimationProps {}
 
 export const SatelliteAnimation = ({}: SatelliteAnimationProps) => {
