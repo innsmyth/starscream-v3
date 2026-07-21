@@ -186,7 +186,7 @@ export default function Home() {
       getPlanesAround();
     }, 10000);
     return () => clearInterval(planeInterval);
-  }, []);
+  }, [getPlanesAround]);
 
   // Listen for a test-plane-enabled event (dispatched by TestToggle) and fetch immediately
   useEffect(() => {
@@ -308,12 +308,12 @@ export default function Home() {
 
   useEffect(() => {
     getSatellitesAround();
-    // Fetch aircraft data every 10 seconds
+    // Fetch satellite data every 10 seconds
     const satelliteInterval = setInterval(() => {
       getSatellitesAround();
     }, 10000);
     return () => clearInterval(satelliteInterval);
-  }, []);
+  }, [getSatellitesAround]);
 
   return (
     <div className="min-h-screen w-full bg-black">

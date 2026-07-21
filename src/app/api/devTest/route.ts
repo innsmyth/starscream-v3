@@ -15,7 +15,9 @@ export async function GET(request: NextRequest) {
     const type = (searchParams.get("type") || "plane").toLowerCase();
 
     const isSatellite = type === "satellite" || type === "sat" || type === "starship";
-    if (isSatellite) return NextResponse.json({ type: "satellite", enabledUntil: testMode.enableTestSatellite(seconds), seconds });
+    if (isSatellite)
+      return NextResponse.json({ type: "satellite", enabledUntil: testMode.enableTestSatellite(seconds), seconds });
+
     return NextResponse.json({ type: "plane", enabledUntil: testMode.enableTestPlane(seconds), seconds });
   } catch (err) {
     return NextResponse.json({ error: "Failed to enable dev test plane" }, { status: 500 });

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import * as testMode from "../../../lib/testMode";
+
 export const revalidate = 0;
+
 const API_URL = process.env.LOCAL_ADSB_URL || "";
 
 export async function GET() {

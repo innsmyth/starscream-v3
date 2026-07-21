@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import * as testMode from "../../../lib/testMode";
+
 export const revalidate = 0;
+
 const BASE_URL = process.env.NEXT_PUBLIC_ORBIT_DETAILS_URL || "";
 const CENTER_LAT = process.env.NEXT_PUBLIC_CENTER_LAT || "";
 const CENTER_LON = process.env.NEXT_PUBLIC_CENTER_LON || "";
@@ -12,9 +14,11 @@ export async function GET() {
   try {
     // In test mode return mock satellite when enabled, otherwise fetch external data
     const isTest = process.env.NODE_ENV !== "production" && testMode.isTestMode();
+
     if (isTest && testMode.isTestSatelliteEnabled()) {
       const lat = parseFloat(process.env.NEXT_PUBLIC_CENTER_LAT || "51.47674088740635");
       const lon = parseFloat(process.env.NEXT_PUBLIC_CENTER_LON || "-0.23339838187103154");
+
       return NextResponse.json({
         above: [
           {
@@ -31,8 +35,13 @@ export async function GET() {
     }
 
     const API_URL = `${BASE_URL}${CENTER_LAT}/${CENTER_LON}/${CENTER_ALT}/${RADIUS_KM}/0/&apiKey=${API_KEY}`;
+
     const response = await fetch(API_URL);
-    if (!response.ok) return NextResponse.json({ error: "Failed to fetch starship data" }, { status: response.status });
+
+    if (!response.ok) {
+      return NextResponse.json({ error: "Failed to fetch starship data" }, { status: response.status });
+    }
+
     return NextResponse.json(await response.json());
   } catch (error) {
     // Handle any errors that occur during the fetch
