@@ -100,10 +100,10 @@ export default function Home() {
 
       try {
         const nearestPlaneCallsign = planeDistances[0]?.flight.trim();
-        if (currentCallsign.current === nearestPlaneCallsign) {
+        // If we already have this callsign and the UI is populated, skip refetch.
+        if (currentCallsign.current === nearestPlaneCallsign && statePlaneData) {
           return true;
         }
-        currentCallsign.current = nearestPlaneCallsign;
         const flightDetails = await fetch(
           `/api/getAirRoute?callsign=${nearestPlaneCallsign}`
         );
@@ -113,6 +113,9 @@ export default function Home() {
           const flightRoute = flightInfo.response.flightroute;
           console.log("Flight route:", flightRoute);
           setStatePlaneData(flightRoute);
+          // Record the callsign after successfully setting UI state so follow-up
+          // calls don't skip fetching when state hasn't been populated yet.
+          currentCallsign.current = nearestPlaneCallsign;
           return true;
         } else {
           console.error("Error fetching flight details:", flightInfo.error);
