@@ -61,14 +61,14 @@ export default function TestToggle() {
         onClick={enableTest}
         className="bg-blue-600 text-white px-3 py-1 rounded"
       >
-        Enable Test Plane (10s)
+        Test Plane (10s)
       </button>
       <div style={{ height: 8 }} />
       <button
         onClick={enableTestSatellite}
         className="bg-red-600 text-white px-3 py-1 rounded mt-2"
       >
-        Enable Test Satellite (10s)
+        Test Satellite (10s)
       </button>
       {status && <div className="text-white mt-2">{status}</div>}
     </div>
