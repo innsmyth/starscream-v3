@@ -216,11 +216,28 @@ export default function Home() {
           console.debug("testPlaneEnabled: scheduling based on seconds, msRemaining=", msRemaining, "enabledUntil=", enabledUntil);
           refreshTimer = window.setTimeout(() => { getPlanesAround(); refreshTimer = null; }, msRemaining + 200) as unknown as number;
           if (clearStateTimer) window.clearTimeout(clearStateTimer);
+          // At the scheduled expiry, double-check the backend before clearing UI state.
+          // This avoids clearing when the server still reports the test plane due to
+          // timing or propagation delays.
           clearStateTimer = window.setTimeout(() => {
-            console.debug("testPlaneEnabled: clearing plane UI fallback at", new Date().toLocaleTimeString());
-            setStatePlaneData(null);
-            currentCallsign.current = "";
-            clearStateTimer = null;
+            (async () => {
+              console.debug("testPlaneEnabled: expiry reached, re-checking planes at", new Date().toLocaleTimeString());
+              try {
+                const still = await getPlanesAround();
+                if (!still) {
+                  console.debug("testPlaneEnabled: no plane found on re-check, clearing UI");
+                  setStatePlaneData(null);
+                  currentCallsign.current = "";
+                } else {
+                  console.debug("testPlaneEnabled: plane still present on re-check, leaving UI intact");
+                }
+              } catch (e) {
+                console.debug("testPlaneEnabled: re-check failed, clearing UI as fallback", e);
+                setStatePlaneData(null);
+                currentCallsign.current = "";
+              }
+              clearStateTimer = null;
+            })();
           }, msRemaining + 500) as unknown as number;
         } catch (e) {
           // ignore
