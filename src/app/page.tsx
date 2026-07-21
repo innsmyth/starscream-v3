@@ -100,10 +100,10 @@ export default function Home() {
 
       try {
         const nearestPlaneCallsign = planeDistances[0]?.flight.trim();
-        if (currentCallsign.current === nearestPlaneCallsign) {
+        // If we already have this callsign and the UI is populated, skip refetch.
+        if (currentCallsign.current === nearestPlaneCallsign && statePlaneData) {
           return true;
         }
-        currentCallsign.current = nearestPlaneCallsign;
         const flightDetails = await fetch(
           `/api/getAirRoute?callsign=${nearestPlaneCallsign}`
         );
@@ -113,6 +113,9 @@ export default function Home() {
           const flightRoute = flightInfo.response.flightroute;
           console.log("Flight route:", flightRoute);
           setStatePlaneData(flightRoute);
+          // Record the callsign after successfully setting UI state so follow-up
+          // calls don't skip fetching when state hasn't been populated yet.
+          currentCallsign.current = nearestPlaneCallsign;
           return true;
         } else {
           console.error("Error fetching flight details:", flightInfo.error);
@@ -209,14 +212,35 @@ export default function Home() {
         getPlanesAround();
         if (refreshTimer) window.clearTimeout(refreshTimer);
         try {
-          const msRemaining = enabledUntil ? Math.max(0, enabledUntil - Date.now()) : Math.max(0, (seconds || 10) * 1000);
+          // Always base client timers on the server-returned duration (seconds)
+          // rather than the absolute enabledUntil timestamp. This avoids
+          // premature clears when the client clock is ahead of the server.
+          const msRemaining = Math.max(0, (seconds || 10) * 1000);
+          console.debug("testPlaneEnabled: scheduling based on seconds, msRemaining=", msRemaining, "enabledUntil=", enabledUntil);
           refreshTimer = window.setTimeout(() => { getPlanesAround(); refreshTimer = null; }, msRemaining + 200) as unknown as number;
           if (clearStateTimer) window.clearTimeout(clearStateTimer);
+          // At the scheduled expiry, double-check the backend before clearing UI state.
+          // This avoids clearing when the server still reports the test plane due to
+          // timing or propagation delays.
           clearStateTimer = window.setTimeout(() => {
-            console.debug("testPlaneEnabled: clearing plane UI fallback at", new Date().toLocaleTimeString());
-            setStatePlaneData(null);
-            currentCallsign.current = "";
-            clearStateTimer = null;
+            (async () => {
+              console.debug("testPlaneEnabled: expiry reached, re-checking planes at", new Date().toLocaleTimeString());
+              try {
+                const still = await getPlanesAround();
+                if (!still) {
+                  console.debug("testPlaneEnabled: no plane found on re-check, clearing UI");
+                  setStatePlaneData(null);
+                  currentCallsign.current = "";
+                } else {
+                  console.debug("testPlaneEnabled: plane still present on re-check, leaving UI intact");
+                }
+              } catch (e) {
+                console.debug("testPlaneEnabled: re-check failed, clearing UI as fallback", e);
+                setStatePlaneData(null);
+                currentCallsign.current = "";
+              }
+              clearStateTimer = null;
+            })();
           }, msRemaining + 500) as unknown as number;
         } catch (e) {
           // ignore
