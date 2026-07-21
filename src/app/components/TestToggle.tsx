@@ -19,7 +19,7 @@ export default function TestToggle() {
       const res = await fetch("/api/devTest?type=plane&seconds=10");
       const json = await res.json();
       if (res.ok) {
-        setStatus(`Enabled plane until ${new Date(json.enabledUntil).toLocaleTimeString()}`);
+        setStatus(`Test Plane for ${json.seconds} secs`);
         // Notify the app to fetch aircraft immediately and include the server-side enabledUntil
         try {
           window.dispatchEvent(new CustomEvent("testPlaneEnabled", { detail: { enabledUntil: json.enabledUntil, seconds: json.seconds } }));
@@ -40,7 +40,7 @@ export default function TestToggle() {
       const res = await fetch("/api/devTest?type=satellite&seconds=10");
       const json = await res.json();
       if (res.ok) {
-        setStatus(`Enabled satellite until ${new Date(json.enabledUntil).toLocaleTimeString()}`);
+        setStatus(`Test Satellite for ${json.seconds} secs`);
         // Notify the app to fetch satellites immediately and include the server-side enabledUntil
         try {
           window.dispatchEvent(new CustomEvent("testSatelliteEnabled", { detail: { enabledUntil: json.enabledUntil, seconds: json.seconds } }));
