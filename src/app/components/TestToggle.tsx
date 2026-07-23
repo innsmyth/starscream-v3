@@ -4,12 +4,19 @@
  satellite for a timed window; notifies the page via CustomEvent with details.
 */
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function TestToggle() {
   const [status, setStatus] = useState<string>("");
   const isTestMode = (process.env.NEXT_PUBLIC_APP_MODE || "").toLowerCase() === "test";
-  // No timers here; page.tsx will schedule refresh based on event details
+  // Status clear timer: clear the UI status message after the test window elapses
+  const statusTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (statusTimerRef.current) window.clearTimeout(statusTimerRef.current);
+    };
+  }, []);
 
   if (!isTestMode) return null;
 
@@ -20,6 +27,8 @@ export default function TestToggle() {
       const json = await res.json();
       if (res.ok) {
         setStatus(`Test Plane for ${json.seconds}s`);
+        if (statusTimerRef.current) window.clearTimeout(statusTimerRef.current);
+        statusTimerRef.current = window.setTimeout(() => setStatus(""), (json.seconds || 10) * 1000 + 500) as unknown as number;
         // Notify the app to fetch aircraft immediately and include the server-side enabledUntil
         try {
           window.dispatchEvent(new CustomEvent("testPlaneEnabled", { detail: { enabledUntil: json.enabledUntil, seconds: json.seconds } }));
@@ -41,6 +50,8 @@ export default function TestToggle() {
       const json = await res.json();
       if (res.ok) {
         setStatus(`Test Satellite for ${json.seconds}s`);
+        if (statusTimerRef.current) window.clearTimeout(statusTimerRef.current);
+        statusTimerRef.current = window.setTimeout(() => setStatus(""), (json.seconds || 10) * 1000 + 500) as unknown as number;
         // Notify the app to fetch satellites immediately and include the server-side enabledUntil
         try {
           window.dispatchEvent(new CustomEvent("testSatelliteEnabled", { detail: { enabledUntil: json.enabledUntil, seconds: json.seconds } }));
