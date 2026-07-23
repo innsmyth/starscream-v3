@@ -358,9 +358,9 @@ export default function Home() {
             {statePlaneData ? (
               <div className="text-white text-left bg-black/40 p-2 rounded w-full">
                 {planeSlide.map((item, idx) => (
-                  <div key={idx} className="flex flex-col mb-2">
+                  <div key={idx} className="flex flex-col mb-4">
                     <span className="text-6xl font-semibold">{item.stat}</span>
-                    <div className="text-2xl mt-2">{item.title}</div>
+                    <div className="text-2xl mt-4">{item.title}</div>
                   </div>
                 ))}
               </div>
@@ -371,9 +371,9 @@ export default function Home() {
             {stateSatelliteData ? (
               <div className="text-white text-right bg-black/40 p-2 rounded w-full">
                 {satelliteSlide.map((item, idx) => (
-                  <div key={idx} className="flex flex-col items-end mb-2">
+                  <div key={idx} className="flex flex-col items-end mb-4">
                     <span className="text-6xl font-semibold">{item.stat}</span>
-                    <div className="text-2xl mt-2">{item.title}</div>
+                    <div className="text-2xl mt-4">{item.title}</div>
                   </div>
                 ))}
               </div>
