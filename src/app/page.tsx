@@ -354,15 +354,20 @@ export default function Home() {
         {/* Grid: 3x3 filling the viewport */}
         <div className="grid grid-cols-3 grid-rows-3 gap-4 w-full h-full">
           {/* Row 1 */}
-          <div className="bg-transparent border border-gray-700 h-40" />
-          <div className="bg-transparent border border-gray-700 h-40" />
-          <div className="bg-transparent border border-gray-700 h-40" />
+          <div className="bg-transparent border border-gray-700 h-full" />
+          <div className="bg-transparent border border-gray-700 h-full" />
+          <div className="bg-transparent border border-gray-700 h-full" />
 
           {/* Row 2 */}
-          <div className="bg-transparent border border-gray-700 h-40" />
-          {/* Center cell: current clock */}
+          <div className="bg-transparent border border-gray-700 h-full" />
+          {/* Center cell: original clock and details (SlideHolder) */}
           <div className="bg-transparent border border-gray-600 h-full flex items-center justify-center text-white">
-            <span className="text-6xl font-semibold">{currentTime}</span>
+            <div className="w-full h-full">
+              <SlideHolder
+                slides={statePlaneData ? planeSlide : (stateSatelliteData ? satelliteSlide : slides)}
+                splideRef={splideRef}
+              />
+            </div>
           </div>
           <div className="bg-transparent border border-gray-700 h-full" />
 
@@ -376,13 +381,7 @@ export default function Home() {
         {(statePlaneData && <PlaneAnimation />) || (stateSatelliteData && <SatelliteAnimation />)}
       </div>
 
-      {/* Slide holder remains visible — position it at the bottom center */}
-      <div className="w-full flex justify-center pb-8">
-        <SlideHolder
-          slides={statePlaneData ? planeSlide : (stateSatelliteData ? satelliteSlide : slides)}
-          splideRef={splideRef}
-        />
-      </div>
+      {/* (SlideHolder moved into center grid cell) */}
     </div>
   );
 }
