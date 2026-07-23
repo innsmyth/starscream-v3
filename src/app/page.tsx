@@ -440,20 +440,7 @@ export default function Home() {
               </div>
             ) : null}
           </div>
-          <div className="bg-transparent border border-gray-700 h-full flex items-center justify-center p-4">
-            {statePlaneData?.destination ? (
-              <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center justify-center h-full">
-                <div className="flex flex-col items-center mb-4">
-                  <span className="text-6xl font-semibold">{statePlaneData.destination.municipality}</span>
-                  <div className="text-2xl mt-4">Destination City</div>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-6xl font-semibold">{statePlaneData.destination.iata_code}</span>
-                  <div className="text-2xl mt-4">Airport Code</div>
-                </div>
-              </div>
-          ) : null}
-          </div>
+          <div className="bg-transparent border border-gray-700 h-full" />
           <div className="bg-transparent border border-gray-700 h-full flex items-center justify-center p-4">
             {showSatelliteInfo && stateSatelliteData ? (
               <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center justify-center h-full">
@@ -468,6 +455,11 @@ export default function Home() {
           </div>
 
           {/* Row 2 */}
+          <div className="bg-transparent border border-gray-700 h-full flex items-center justify-center p-4" />
+          {/* Center cell: just the clock */}
+          <div className="bg-transparent border border-gray-600 h-full flex items-center justify-center text-white">
+            <div className="text-6xl font-semibold">{currentTime}</div>
+          </div>
           <div className="bg-transparent border border-gray-700 h-full flex items-center justify-center p-4">
             {statePlaneData?.destination ? (
               <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center justify-center h-full">
@@ -482,11 +474,6 @@ export default function Home() {
               </div>
             ) : null}
           </div>
-          {/* Center cell: just the clock */}
-          <div className="bg-transparent border border-gray-600 h-full flex items-center justify-center text-white">
-            <div className="text-6xl font-semibold">{currentTime}</div>
-          </div>
-          <div className="bg-transparent border border-gray-700 h-full" />
 
           {/* Row 3 */}
           <div className="bg-transparent border border-gray-700 h-full" />
