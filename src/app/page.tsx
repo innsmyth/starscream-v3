@@ -239,6 +239,16 @@ export default function Home() {
         const seconds = detail.seconds || 10;
         console.debug("testPlaneEnabled: scheduling fetch/poll, seconds=", seconds, "at", new Date().toLocaleTimeString());
         getPlanesAround();
+        // Ensure animation plays immediately when test is triggered
+        try {
+          setShowPlaneInfo(false);
+          setAnimQueue((q) => {
+            if (q.includes("plane") || currentAnim === "plane") return q;
+            return [...q, "plane"];
+          });
+        } catch (e) {
+          // ignore
+        }
         if (refreshTimer) window.clearTimeout(refreshTimer);
         try {
           // Always base client timers on the server-returned duration (seconds)
@@ -318,6 +328,16 @@ export default function Home() {
         // Fire an immediate fetch to show the test satellite
         console.debug("testSatelliteEnabled: scheduling fetch/poll, seconds=", seconds, "at", new Date().toLocaleTimeString());
         getSatellitesAround();
+        // Ensure satellite animation plays immediately when test is triggered
+        try {
+          setShowSatelliteInfo(false);
+          setAnimQueue((q) => {
+            if (q.includes("satellite") || currentAnim === "satellite") return q;
+            return [...q, "satellite"];
+          });
+        } catch (e) {
+          // ignore
+        }
         if (refreshTimer) window.clearTimeout(refreshTimer);
         // Schedule a single re-check after the nominal window (seconds)
         try {
