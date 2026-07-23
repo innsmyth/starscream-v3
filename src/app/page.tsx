@@ -6,7 +6,6 @@
 
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
-import SlideHolder from "./components/SlideHolder";
 import { PlaneAnimation } from "./components/PlaneAnimation";
 import { SatelliteAnimation } from "./components/SatelliteAnimation";
 import TestToggle from "./components/TestToggle";
@@ -24,7 +23,7 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState<string>("");
   const currentCallsign = useRef<string>("");
   const currentSatellite = useRef<any>(null);
-  const splideRef = useRef<any>(null);
+  // splideRef removed; SlideHolder not used in center anymore
 
   // Code to determine if we use the origin or destination:
   let planeData = statePlaneData?.origin || {}
@@ -356,22 +355,26 @@ export default function Home() {
           {/* Row 1: plane (left), spacer (center), satellite (right) */}
           <div className="bg-transparent border border-gray-700 h-full flex items-start justify-start p-4">
             {statePlaneData ? (
-              <div className="text-white text-left text-sm bg-black/40 p-2 rounded">
-                <div className="font-semibold">{planeData?.whichOne} Plane</div>
-                <div className="mt-1">Flight: {statePlaneData?.callsign || statePlaneData?.flight || planeData?.flight || "TEST"}</div>
-                <div>Airport: {planeData?.iata_code || statePlaneData?.origin?.iata_code}</div>
-                <div className="mt-1">City: {planeData?.municipality}</div>
+              <div className="text-white text-left bg-black/40 p-2 rounded w-full">
+                {planeSlide.map((item, idx) => (
+                  <div key={idx} className="flex flex-col mb-2">
+                    <span className="text-6xl font-semibold">{item.stat}</span>
+                    <div className="text-2xl mt-2">{item.title}</div>
+                  </div>
+                ))}
               </div>
             ) : null}
           </div>
           <div className="bg-transparent border border-gray-700 h-full" />
           <div className="bg-transparent border border-gray-700 h-full flex items-start justify-end p-4">
             {stateSatelliteData ? (
-              <div className="text-white text-right text-sm bg-black/40 p-2 rounded">
-                <div className="font-semibold">Satellite</div>
-                <div className="mt-1">{stateSatelliteData?.satname}</div>
-                <div>Alt: {stateSatelliteData?.satalt}</div>
-                <div className="mt-1">Designator: {stateSatelliteData?.intDesignator}</div>
+              <div className="text-white text-right bg-black/40 p-2 rounded w-full">
+                {satelliteSlide.map((item, idx) => (
+                  <div key={idx} className="flex flex-col items-end mb-2">
+                    <span className="text-6xl font-semibold">{item.stat}</span>
+                    <div className="text-2xl mt-2">{item.title}</div>
+                  </div>
+                ))}
               </div>
             ) : null}
           </div>
