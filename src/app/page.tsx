@@ -21,6 +21,14 @@ const LOCAL_AIRPORT_LIST = (process.env.NEXT_PUBLIC_LOCAL_AIRPORT_CODES || "").s
 export default function Home() {
   const [statePlaneData, setStatePlaneData] = useState<any>(null);
   const [stateSatelliteData, setStateSatelliteData] = useState<any>(null);
+  const [showPlaneInfo, setShowPlaneInfo] = useState(false);
+  const [showSatelliteInfo, setShowSatelliteInfo] = useState(false);
+
+  const [animQueue, setAnimQueue] = useState<string[]>([]);
+  const [currentAnim, setCurrentAnim] = useState<string | null>(null);
+  const animatingRef = useRef(false);
+  const prevPlaneId = useRef<string | null>(null);
+  const prevSatelliteId = useRef<string | null>(null);
   const [currentTime, setCurrentTime] = useState<string>("");
   const currentCallsign = useRef<string>("");
   const currentSatellite = useRef<any>(null);
@@ -95,6 +103,8 @@ export default function Home() {
         setStatePlaneData(null);
         // clear current callsign so a re-enabled test plane will trigger fetch
         currentCallsign.current = "";
+        prevPlaneId.current = null;
+        setShowPlaneInfo(false);
         return false;
       }
 
@@ -113,6 +123,15 @@ export default function Home() {
           const flightRoute = flightInfo.response.flightroute;
           console.log("Flight route:", flightRoute);
           setStatePlaneData(flightRoute);
+          // Only trigger animation/info when this is a new plane
+          if (prevPlaneId.current !== nearestPlaneCallsign) {
+            prevPlaneId.current = nearestPlaneCallsign;
+            setShowPlaneInfo(false);
+            setAnimQueue((q) => {
+              if (q.includes("plane") || currentAnim === "plane") return q;
+              return [...q, "plane"];
+            });
+          }
           // Record the callsign after successfully setting UI state so follow-up
           // calls don't skip fetching when state hasn't been populated yet.
           currentCallsign.current = nearestPlaneCallsign;
@@ -156,6 +175,8 @@ export default function Home() {
       if (satelliteData.length === 0) {
         setStateSatelliteData(null);
         currentSatellite.current = null;
+          prevSatelliteId.current = null;
+          setShowSatelliteInfo(false);
         return false;
       }
 
@@ -165,9 +186,17 @@ export default function Home() {
           return;
         }
         currentSatellite.current = nearestSatellite;
-        
+
         if (satellitesAround.ok) {
           setStateSatelliteData(nearestSatellite);
+          if (prevSatelliteId.current !== nearestSatellite.satid) {
+            prevSatelliteId.current = nearestSatellite.satid;
+            setShowSatelliteInfo(false);
+            setAnimQueue((q) => {
+              if (q.includes("satellite") || currentAnim === "satellite") return q;
+              return [...q, "satellite"];
+            });
+          }
         } else {
           console.error("Error fetching nearest satellite details:", response.error);
         }
@@ -210,6 +239,16 @@ export default function Home() {
         const seconds = detail.seconds || 10;
         console.debug("testPlaneEnabled: scheduling fetch/poll, seconds=", seconds, "at", new Date().toLocaleTimeString());
         getPlanesAround();
+        // Ensure animation plays immediately when test is triggered
+        try {
+          setShowPlaneInfo(false);
+          setAnimQueue((q) => {
+            if (q.includes("plane") || currentAnim === "plane") return q;
+            return [...q, "plane"];
+          });
+        } catch (e) {
+          // ignore
+        }
         if (refreshTimer) window.clearTimeout(refreshTimer);
         try {
           // Always base client timers on the server-returned duration (seconds)
@@ -289,6 +328,16 @@ export default function Home() {
         // Fire an immediate fetch to show the test satellite
         console.debug("testSatelliteEnabled: scheduling fetch/poll, seconds=", seconds, "at", new Date().toLocaleTimeString());
         getSatellitesAround();
+        // Ensure satellite animation plays immediately when test is triggered
+        try {
+          setShowSatelliteInfo(false);
+          setAnimQueue((q) => {
+            if (q.includes("satellite") || currentAnim === "satellite") return q;
+            return [...q, "satellite"];
+          });
+        } catch (e) {
+          // ignore
+        }
         if (refreshTimer) window.clearTimeout(refreshTimer);
         // Schedule a single re-check after the nominal window (seconds)
         try {
@@ -345,14 +394,99 @@ export default function Home() {
     return () => clearInterval(satelliteInterval);
   }, [getSatellitesAround]);
 
+  // Animation queue processor
+  useEffect(() => {
+    if (animatingRef.current) return;
+    if (animQueue.length === 0) return;
+    const next = animQueue[0];
+    animatingRef.current = true;
+    setCurrentAnim(next);
+
+    // play animation by setting currentAnim; animations are absolute positioned
+    const duration = 3000;
+    const t = window.setTimeout(() => {
+      animatingRef.current = false;
+      setCurrentAnim(null);
+      setAnimQueue((q) => q.slice(1));
+      // show info panel after animation
+      if (next === "plane") {
+        setShowPlaneInfo(true);
+      }
+      if (next === "satellite") {
+        setShowSatelliteInfo(true);
+      }
+    }, duration + 100);
+    return () => window.clearTimeout(t);
+  }, [animQueue]);
+
   return (
     <div className="min-h-screen w-full bg-black">
       <TestToggle />
-      {(statePlaneData && <PlaneAnimation />) || (stateSatelliteData && <SatelliteAnimation />)}
-      <SlideHolder
-        slides={statePlaneData ? planeSlide : (stateSatelliteData ? satelliteSlide : slides)}
-        splideRef={splideRef}
-      />
+
+      {/* Main container: full-screen grid with animations overlaying it */}
+      <div className="relative w-full h-screen">
+        {/* Grid: 3x3 filling the viewport */}
+        <div className="grid grid-cols-3 grid-rows-3 gap-4 w-full h-full">
+          {/* Row 1: plane (left), spacer (center), satellite (right) */}
+          <div className="bg-transparent h-full flex items-center justify-center p-4">
+            {showPlaneInfo && statePlaneData ? (
+              <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center justify-center h-full">
+                {planeSlide.map((item, idx) => (
+                  <div key={idx} className="flex flex-col items-center mb-4">
+                    <span className="text-6xl font-semibold">{item.stat}</span>
+                    <div className="text-2xl mt-4">{item.title}</div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <div className="bg-transparent h-full" />
+          <div className="bg-transparent h-full flex items-center justify-center p-4">
+            {showSatelliteInfo && stateSatelliteData ? (
+              <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center justify-center h-full">
+                {satelliteSlide.map((item, idx) => (
+                  <div key={idx} className="flex flex-col items-center mb-4">
+                    <span className="text-6xl font-semibold">{item.stat}</span>
+                    <div className="text-2xl mt-4">{item.title}</div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          {/* Row 2 */}
+          <div className="bg-transparent border border-gray-700 h-full flex items-center justify-center p-4" />
+          {/* Center cell: just the clock */}
+          <div className="bg-transparent border border-gray-600 h-full flex items-center justify-center text-white">
+            <div className="text-6xl font-semibold">{currentTime}</div>
+          </div>
+          <div className="bg-transparent border border-gray-700 h-full flex items-center justify-center p-4" />
+
+          {/* Row 3 */}
+          <div className="bg-transparent h-full flex items-center justify-center p-4">
+            {statePlaneData?.destination ? (
+              <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center justify-center h-full">
+                <div className="flex flex-col items-center mb-4">
+                  <span className="text-6xl font-semibold">{statePlaneData.destination.municipality}</span>
+                  <div className="text-2xl mt-4">Destination City</div>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-6xl font-semibold">{statePlaneData.destination.iata_code}</span>
+                  <div className="text-2xl mt-4">Airport Code</div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+          <div className="bg-transparent border border-gray-700 h-full" />
+          <div className="bg-transparent border border-gray-700 h-full" />
+        </div>
+
+        {/* Animations overlay the grid when active; components use absolute positioning */}
+        {currentAnim === "plane" && <PlaneAnimation />}
+        {currentAnim === "satellite" && <SatelliteAnimation />}
+      </div>
+
+      {/* (SlideHolder moved into center grid cell) */}
     </div>
   );
 }
