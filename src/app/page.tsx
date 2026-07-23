@@ -428,9 +428,9 @@ export default function Home() {
         {/* Grid: 3x3 filling the viewport */}
         <div className="grid grid-cols-3 grid-rows-3 gap-4 w-full h-full">
           {/* Row 1: plane (left), spacer (center), satellite (right) */}
-          <div className="bg-transparent border border-gray-700 h-full flex items-start justify-start p-4">
+          <div className="bg-transparent border border-gray-700 h-full flex items-center justify-center p-4">
             {showPlaneInfo && statePlaneData ? (
-              <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center">
+              <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center justify-center h-full">
                 {planeSlide.map((item, idx) => (
                   <div key={idx} className="flex flex-col items-center mb-4">
                     <span className="text-6xl font-semibold">{item.stat}</span>
@@ -441,9 +441,9 @@ export default function Home() {
             ) : null}
           </div>
           <div className="bg-transparent border border-gray-700 h-full" />
-          <div className="bg-transparent border border-gray-700 h-full flex items-start justify-end p-4">
+          <div className="bg-transparent border border-gray-700 h-full flex items-center justify-center p-4">
             {showSatelliteInfo && stateSatelliteData ? (
-              <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center">
+              <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center justify-center h-full">
                 {satelliteSlide.map((item, idx) => (
                   <div key={idx} className="flex flex-col items-center mb-4">
                     <span className="text-6xl font-semibold">{item.stat}</span>
