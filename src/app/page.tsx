@@ -452,8 +452,8 @@ export default function Home() {
                   <div className="text-2xl mt-4">Airport Code</div>
                 </div>
               </div>
-            ) : null}
-          </div
+          ) : null}
+          </div>
           <div className="bg-transparent border border-gray-700 h-full flex items-center justify-center p-4">
             {showSatelliteInfo && stateSatelliteData ? (
               <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center justify-center h-full">
