@@ -6,6 +6,7 @@
 
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
+import SlideHolder from "./components/SlideHolder";
 import { PlaneAnimation } from "./components/PlaneAnimation";
 import { SatelliteAnimation } from "./components/SatelliteAnimation";
 import TestToggle from "./components/TestToggle";
@@ -23,7 +24,7 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState<string>("");
   const currentCallsign = useRef<string>("");
   const currentSatellite = useRef<any>(null);
-  // splideRef removed; SlideHolder not used in center anymore
+  const splideRef = useRef<any>(null);
 
   // Code to determine if we use the origin or destination:
   let planeData = statePlaneData?.origin || {}
