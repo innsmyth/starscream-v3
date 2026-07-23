@@ -364,7 +364,7 @@ export default function Home() {
           <div className="bg-transparent border border-gray-600 h-40 flex items-center justify-center text-white text-3xl font-mono">
             {currentTime}
           </div>
-          <div className="bg-gray-800 border border-gray-700 h-40" />
+          <div className="bg-transparent border border-gray-700 h-40" />
 
           {/* Row 3 */}
           <div className="bg-transparent border border-gray-700 h-40" />
