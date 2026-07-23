@@ -382,14 +382,9 @@ export default function Home() {
 
           {/* Row 2 */}
           <div className="bg-transparent border border-gray-700 h-full" />
-          {/* Center cell: original clock and details (SlideHolder) */}
+          {/* Center cell: just the clock */}
           <div className="bg-transparent border border-gray-600 h-full flex items-center justify-center text-white">
-            <div className="w-full h-full">
-              <SlideHolder
-                slides={statePlaneData ? planeSlide : (stateSatelliteData ? satelliteSlide : slides)}
-                splideRef={splideRef}
-              />
-            </div>
+            <div className="text-6xl font-semibold">{currentTime}</div>
           </div>
           <div className="bg-transparent border border-gray-700 h-full" />
 
