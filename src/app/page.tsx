@@ -353,10 +353,28 @@ export default function Home() {
       <div className="relative w-full h-screen">
         {/* Grid: 3x3 filling the viewport */}
         <div className="grid grid-cols-3 grid-rows-3 gap-4 w-full h-full">
-          {/* Row 1 */}
+          {/* Row 1: plane (left), spacer (center), satellite (right) */}
+          <div className="bg-transparent border border-gray-700 h-full flex items-start justify-start p-4">
+            {statePlaneData ? (
+              <div className="text-white text-left text-sm bg-black/40 p-2 rounded">
+                <div className="font-semibold">{planeData?.whichOne} Plane</div>
+                <div className="mt-1">Flight: {statePlaneData?.callsign || statePlaneData?.flight || planeData?.flight || "TEST"}</div>
+                <div>Airport: {planeData?.iata_code || statePlaneData?.origin?.iata_code}</div>
+                <div className="mt-1">City: {planeData?.municipality}</div>
+              </div>
+            ) : null}
+          </div>
           <div className="bg-transparent border border-gray-700 h-full" />
-          <div className="bg-transparent border border-gray-700 h-full" />
-          <div className="bg-transparent border border-gray-700 h-full" />
+          <div className="bg-transparent border border-gray-700 h-full flex items-start justify-end p-4">
+            {stateSatelliteData ? (
+              <div className="text-white text-right text-sm bg-black/40 p-2 rounded">
+                <div className="font-semibold">Satellite</div>
+                <div className="mt-1">{stateSatelliteData?.satname}</div>
+                <div>Alt: {stateSatelliteData?.satalt}</div>
+                <div className="mt-1">Designator: {stateSatelliteData?.intDesignator}</div>
+              </div>
+            ) : null}
+          </div>
 
           {/* Row 2 */}
           <div className="bg-transparent border border-gray-700 h-full" />
