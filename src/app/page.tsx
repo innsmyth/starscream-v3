@@ -21,6 +21,14 @@ const LOCAL_AIRPORT_LIST = (process.env.NEXT_PUBLIC_LOCAL_AIRPORT_CODES || "").s
 export default function Home() {
   const [statePlaneData, setStatePlaneData] = useState<any>(null);
   const [stateSatelliteData, setStateSatelliteData] = useState<any>(null);
+  const [showPlaneInfo, setShowPlaneInfo] = useState(false);
+  const [showSatelliteInfo, setShowSatelliteInfo] = useState(false);
+
+  const [animQueue, setAnimQueue] = useState<string[]>([]);
+  const [currentAnim, setCurrentAnim] = useState<string | null>(null);
+  const animatingRef = useRef(false);
+  const prevPlaneId = useRef<string | null>(null);
+  const prevSatelliteId = useRef<string | null>(null);
   const [currentTime, setCurrentTime] = useState<string>("");
   const currentCallsign = useRef<string>("");
   const currentSatellite = useRef<any>(null);
@@ -95,6 +103,8 @@ export default function Home() {
         setStatePlaneData(null);
         // clear current callsign so a re-enabled test plane will trigger fetch
         currentCallsign.current = "";
+        prevPlaneId.current = null;
+        setShowPlaneInfo(false);
         return false;
       }
 
@@ -113,6 +123,15 @@ export default function Home() {
           const flightRoute = flightInfo.response.flightroute;
           console.log("Flight route:", flightRoute);
           setStatePlaneData(flightRoute);
+          // Only trigger animation/info when this is a new plane
+          if (prevPlaneId.current !== nearestPlaneCallsign) {
+            prevPlaneId.current = nearestPlaneCallsign;
+            setShowPlaneInfo(false);
+            setAnimQueue((q) => {
+              if (q.includes("plane") || currentAnim === "plane") return q;
+              return [...q, "plane"];
+            });
+          }
           // Record the callsign after successfully setting UI state so follow-up
           // calls don't skip fetching when state hasn't been populated yet.
           currentCallsign.current = nearestPlaneCallsign;
@@ -156,6 +175,8 @@ export default function Home() {
       if (satelliteData.length === 0) {
         setStateSatelliteData(null);
         currentSatellite.current = null;
+          prevSatelliteId.current = null;
+          setShowSatelliteInfo(false);
         return false;
       }
 
@@ -165,9 +186,17 @@ export default function Home() {
           return;
         }
         currentSatellite.current = nearestSatellite;
-        
+
         if (satellitesAround.ok) {
           setStateSatelliteData(nearestSatellite);
+          if (prevSatelliteId.current !== nearestSatellite.satid) {
+            prevSatelliteId.current = nearestSatellite.satid;
+            setShowSatelliteInfo(false);
+            setAnimQueue((q) => {
+              if (q.includes("satellite") || currentAnim === "satellite") return q;
+              return [...q, "satellite"];
+            });
+          }
         } else {
           console.error("Error fetching nearest satellite details:", response.error);
         }
@@ -345,6 +374,31 @@ export default function Home() {
     return () => clearInterval(satelliteInterval);
   }, [getSatellitesAround]);
 
+  // Animation queue processor
+  useEffect(() => {
+    if (animatingRef.current) return;
+    if (animQueue.length === 0) return;
+    const next = animQueue[0];
+    animatingRef.current = true;
+    setCurrentAnim(next);
+
+    // play animation by setting currentAnim; animations are absolute positioned
+    const duration = 3000;
+    const t = window.setTimeout(() => {
+      animatingRef.current = false;
+      setCurrentAnim(null);
+      setAnimQueue((q) => q.slice(1));
+      // show info panel after animation
+      if (next === "plane") {
+        setShowPlaneInfo(true);
+      }
+      if (next === "satellite") {
+        setShowSatelliteInfo(true);
+      }
+    }, duration + 100);
+    return () => window.clearTimeout(t);
+  }, [animQueue]);
+
   return (
     <div className="min-h-screen w-full bg-black">
       <TestToggle />
@@ -355,7 +409,7 @@ export default function Home() {
         <div className="grid grid-cols-3 grid-rows-3 gap-4 w-full h-full">
           {/* Row 1: plane (left), spacer (center), satellite (right) */}
           <div className="bg-transparent border border-gray-700 h-full flex items-start justify-start p-4">
-            {statePlaneData ? (
+            {showPlaneInfo && statePlaneData ? (
               <div className="text-white text-left bg-black/40 p-2 rounded w-full">
                 {planeSlide.map((item, idx) => (
                   <div key={idx} className="flex flex-col mb-4">
@@ -368,7 +422,7 @@ export default function Home() {
           </div>
           <div className="bg-transparent border border-gray-700 h-full" />
           <div className="bg-transparent border border-gray-700 h-full flex items-start justify-end p-4">
-            {stateSatelliteData ? (
+            {showSatelliteInfo && stateSatelliteData ? (
               <div className="text-white text-right bg-black/40 p-2 rounded w-full">
                 {satelliteSlide.map((item, idx) => (
                   <div key={idx} className="flex flex-col items-end mb-4">
@@ -395,7 +449,8 @@ export default function Home() {
         </div>
 
         {/* Animations overlay the grid when active; components use absolute positioning */}
-        {(statePlaneData && <PlaneAnimation />) || (stateSatelliteData && <SatelliteAnimation />)}
+        {currentAnim === "plane" && <PlaneAnimation />}
+        {currentAnim === "satellite" && <SatelliteAnimation />}
       </div>
 
       {/* (SlideHolder moved into center grid cell) */}
