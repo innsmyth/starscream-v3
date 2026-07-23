@@ -430,9 +430,9 @@ export default function Home() {
           {/* Row 1: plane (left), spacer (center), satellite (right) */}
           <div className="bg-transparent border border-gray-700 h-full flex items-start justify-start p-4">
             {showPlaneInfo && statePlaneData ? (
-              <div className="text-white text-left bg-black/40 p-2 rounded w-full">
+              <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center">
                 {planeSlide.map((item, idx) => (
-                  <div key={idx} className="flex flex-col mb-4">
+                  <div key={idx} className="flex flex-col items-center mb-4">
                     <span className="text-6xl font-semibold">{item.stat}</span>
                     <div className="text-2xl mt-4">{item.title}</div>
                   </div>
@@ -443,9 +443,9 @@ export default function Home() {
           <div className="bg-transparent border border-gray-700 h-full" />
           <div className="bg-transparent border border-gray-700 h-full flex items-start justify-end p-4">
             {showSatelliteInfo && stateSatelliteData ? (
-              <div className="text-white text-right bg-black/40 p-2 rounded w-full">
+              <div className="text-white text-center bg-black/40 p-2 rounded w-full flex flex-col items-center">
                 {satelliteSlide.map((item, idx) => (
-                  <div key={idx} className="flex flex-col items-end mb-4">
+                  <div key={idx} className="flex flex-col items-center mb-4">
                     <span className="text-6xl font-semibold">{item.stat}</span>
                     <div className="text-2xl mt-4">{item.title}</div>
                   </div>
