@@ -18,7 +18,8 @@ const options = {
   type: "loop",
   arrows: false,
   direction: "ttb",
-  height: "100vh",
+  // Use 100% so the Splide instance will size to its parent (center grid cell)
+  height: "100%",
   autoplay: true,
   interval: 10000,
   speed: 1000,
@@ -29,7 +30,7 @@ const SlideHolder = ({ slides, splideRef }: Props) => {
   return (
     <>
       {/* @ts-expect-error Server Component */}
-      <Splide options={options} ref={splideRef}>
+      <Splide options={options} ref={splideRef} className="h-full">
         {slides.map((slide: any, index: number) => {
           return (
             <SplideSlide key={index}>
@@ -39,7 +40,7 @@ const SlideHolder = ({ slides, splideRef }: Props) => {
                     key={index}
                     className={classNames(
                       item.width ? item.width : "w-full",
-                      "text-white items-center justify-center flex flex-col "
+                      "text-white items-center justify-center flex flex-col h-full"
                     )}
                   >
                     <span className="text-6xl font-semibold ">{item.stat}</span>
