@@ -348,11 +348,41 @@ export default function Home() {
   return (
     <div className="min-h-screen w-full bg-black">
       <TestToggle />
-      {(statePlaneData && <PlaneAnimation />) || (stateSatelliteData && <SatelliteAnimation />)}
-      <SlideHolder
-        slides={statePlaneData ? planeSlide : (stateSatelliteData ? satelliteSlide : slides)}
-        splideRef={splideRef}
-      />
+
+      {/* Main container: grid in the center with animations overlaying it */}
+      <div className="relative flex items-center justify-center w-full py-12">
+        {/* Grid: 3x3 using Tailwind CSS grid utilities */}
+        <div className="grid grid-cols-3 grid-rows-3 gap-4 w-full max-w-4xl px-4">
+          {/* Row 1 */}
+          <div className="bg-gray-800 border border-gray-700 h-40" />
+          <div className="bg-gray-800 border border-gray-700 h-40" />
+          <div className="bg-gray-800 border border-gray-700 h-40" />
+
+          {/* Row 2 */}
+          <div className="bg-gray-800 border border-gray-700 h-40" />
+          {/* Center cell: current clock */}
+          <div className="bg-gray-900 border border-gray-600 h-40 flex items-center justify-center text-white text-3xl font-mono">
+            {currentTime}
+          </div>
+          <div className="bg-gray-800 border border-gray-700 h-40" />
+
+          {/* Row 3 */}
+          <div className="bg-gray-800 border border-gray-700 h-40" />
+          <div className="bg-gray-800 border border-gray-700 h-40" />
+          <div className="bg-gray-800 border border-gray-700 h-40" />
+        </div>
+
+        {/* Animations overlay the grid when active; components use absolute positioning */}
+        {(statePlaneData && <PlaneAnimation />) || (stateSatelliteData && <SatelliteAnimation />)}
+      </div>
+
+      {/* Slide holder remains visible — position it at the bottom center */}
+      <div className="w-full flex justify-center pb-8">
+        <SlideHolder
+          slides={statePlaneData ? planeSlide : (stateSatelliteData ? satelliteSlide : slides)}
+          splideRef={splideRef}
+        />
+      </div>
     </div>
   );
 }
